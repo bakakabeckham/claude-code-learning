@@ -1,0 +1,1319 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude Code 斜杠命令完整指南</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #7c3aed;
+            --primary-light: #a78bfa;
+            --primary-dark: #5b21b6;
+            --bg: #f8fafc;
+            --bg-card: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            --code-bg: #1e293b;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.8;
+            font-size: 16px;
+        }
+
+        /* 导航栏 */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            padding: 0 24px;
+            z-index: 1000;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .nav-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+        }
+
+        .nav-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 14px;
+            white-space: nowrap;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .nav-link:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* 主内容 */
+        .main {
+            margin-top: 64px;
+            padding: 40px 24px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Hero */
+        .hero {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 60px 40px;
+            border-radius: 16px;
+            margin-bottom: 48px;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 36px;
+            margin-bottom: 16px;
+            font-weight: 700;
+        }
+
+        .hero p {
+            font-size: 18px;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* 章节 */
+        .section {
+            margin-bottom: 48px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--primary);
+        }
+
+        .section-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            color: white;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        /* 命令卡片 */
+        .command-grid {
+            display: grid;
+            gap: 20px;
+        }
+
+        .command-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .command-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.15);
+        }
+
+        .command-header {
+            background: var(--code-bg);
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .command-code {
+            font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+            font-size: 18px;
+            color: #22d3ee;
+        }
+
+        .command-tags {
+            display: flex;
+            gap: 8px;
+        }
+
+        .command-tag {
+            background: var(--primary);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .command-tag.new {
+            background: var(--success);
+        }
+
+        .command-tag.advanced {
+            background: var(--warning);
+        }
+
+        .command-body {
+            padding: 20px;
+        }
+
+        .command-desc {
+            font-size: 16px;
+            margin-bottom: 16px;
+            color: var(--text);
+        }
+
+        .command-example {
+            background: var(--code-bg);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .command-example h4 {
+            font-size: 14px;
+            color: var(--primary-light);
+            margin-bottom: 8px;
+        }
+
+        .command-example code {
+            display: block;
+            font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+            font-size: 13px;
+            color: #e2e8f0;
+            white-space: pre-wrap;
+            line-height: 1.6;
+        }
+
+        .command-params {
+            background: #f1f5f9;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .command-params h4 {
+            font-size: 14px;
+            color: var(--primary);
+            margin-bottom: 12px;
+        }
+
+        .param-item {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 8px;
+            align-items: flex-start;
+        }
+
+        .param-name {
+            font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+            font-size: 13px;
+            color: var(--primary);
+            background: rgba(124, 58, 237, 0.1);
+            padding: 2px 8px;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+
+        .param-desc {
+            font-size: 14px;
+            color: var(--text-light);
+        }
+
+        .command-tips {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .tip-item {
+            background: #ecfdf5;
+            color: var(--success);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tip-item.warning {
+            background: #fffbeb;
+            color: var(--warning);
+        }
+
+        .tip-item.info {
+            background: #eff6ff;
+            color: var(--info);
+        }
+
+        /* 提示框 */
+        .tip-box {
+            padding: 20px 24px;
+            border-radius: 12px;
+            margin: 24px 0;
+            display: flex;
+            gap: 16px;
+        }
+
+        .tip-box.info {
+            background: #eff6ff;
+            border-left: 4px solid var(--info);
+        }
+
+        .tip-box.success {
+            background: #ecfdf5;
+            border-left: 4px solid var(--success);
+        }
+
+        .tip-box.warning {
+            background: #fffbeb;
+            border-left: 4px solid var(--warning);
+        }
+
+        .tip-icon {
+            font-size: 24px;
+        }
+
+        .tip-content {
+            flex: 1;
+        }
+
+        .tip-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        /* 表格 */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+            font-size: 14px;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .data-table th {
+            background: #f1f5f9;
+            font-weight: 600;
+        }
+
+        .data-table code {
+            background: var(--code-bg);
+            color: #22d3ee;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+            font-size: 13px;
+        }
+
+        /* 分类标签 */
+        .category-tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .category-tab {
+            padding: 10px 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+
+        .category-tab:hover,
+        .category-tab.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* 搜索框 */
+        .search-box {
+            max-width: 600px;
+            margin: 24px auto 0;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 16px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            background: rgba(255,255,255,0.95);
+            color: var(--text);
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 28px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .command-code {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="nav">
+        <div class="nav-inner">
+            <div class="nav-title">📖 Claude Code 斜杠命令指南</div>
+            <div class="nav-links">
+                <a href="#basics" class="nav-link">基础命令</a>
+                <a href="#session" class="nav-link">会话管理</a>
+                <a href="#git" class="nav-link">Git 相关</a>
+                <a href="#review" class="nav-link">代码审查</a>
+                <a href="#workflow" class="nav-link">工作流</a>
+                <a href="#config" class="nav-link">配置</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主内容 -->
+    <main class="main">
+        <div class="container">
+            <!-- Hero -->
+            <div class="hero">
+                <h1>⚡ Claude Code 斜杠命令完整指南</h1>
+                <p>在交互式会话中输入 / 加命令名即可快速执行各种操作，大幅提升效率</p>
+                <div class="search-box">
+                    <input type="text" class="search-input" placeholder="🔍 搜索命令... (输入命令名称或关键词)" id="searchInput" onkeyup="searchCommands()">
+                </div>
+            </div>
+
+            <!-- 使用说明 -->
+            <div class="tip-box info">
+                <div class="tip-icon">💡</div>
+                <div class="tip-content">
+                    <div class="tip-title">什么是斜杠命令？</div>
+                    <p>斜杠命令（Slash Commands）是在 Claude Code 交互式会话中使用的快捷命令。只需输入 <code style="background: var(--code-bg); color: #22d3ee; padding: 2px 8px; border-radius: 4px;">/命令名</code> 即可执行。例如：<code style="background: var(--code-bg); color: #22d3ee; padding: 2px 8px; border-radius: 4px;">/help</code> 显示帮助，<code style="background: var(--code-bg); color: #22d3ee; padding: 2px 8px; border-radius: 4px;">/clear</code> 清空对话。</p>
+                </div>
+            </div>
+
+            <!-- 基础命令 -->
+            <section class="section" id="basics">
+                <div class="section-header">
+                    <div class="section-icon">🏠</div>
+                    <h2 class="section-title">基础命令</h2>
+                </div>
+
+                <div class="command-grid">
+                    <!-- /help -->
+                    <div class="command-card" data-keywords="帮助 文档 说明">
+                        <div class="command-header">
+                            <code class="command-code">/help</code>
+                            <div class="command-tags">
+                                <span class="command-tag">基础</span>
+                            </div>
+                        </div>
+                        <div class="command-body">
+                            <p class="command-desc">显示所有可用命令的帮助信息，当你忘记某个命令时非常有用。</p>
+                            <div class="command-example">
+                                <h4>💡 使用示例</h4>
+                                <code>> /help
+
+# 会显示所有可用命令列表及其简要说明</code>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- /clear -->
+                    <div class="command-card" data-keywords="清空 清除 重置">
+                        <div class="command-header">
+                            <code class="command-code">/clear</code>
+                            <div class="command-tags">
+                                <span class="command-tag">基础</span>
+                            </div>
+                        </div>
+                        <div class="command-body">
+                            <p class="command-desc">清空当前对话历史，开始一个全新的对话。保留项目上下文，但清除之前的消息记录。</p>
+                            <div class="command-example">
+                                <h4>💡 使用场景</h4>
+                                <code># 当对话太长想重新开始时
+> /clear
+
+# 开始一个新的任务
+> /clear
+> 请帮我创建一个新的组件...</code>
+                            </div>
+                            <div class="command-tips">
+                                <span class="tip-item warning">⚠️ 清空后无法恢复历史对话</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- /compact -->
+                    <div class="command-card" data-keywords="压缩 精简 上下文">
+                        <div class="command-header">
+                            <code class="command-code">/compact</code>
+                            <div class="command-tags">
+                                <span class="command-tag">基础</span>
+                            </div>
+                        </div>
+                        <div class="command-body">
+                            <p class="command-desc">压缩对话历史，减少 token 使用量。Claude 会总结之前的对话内容，保留关键信息。</p>
+                            <div class="command-example">
+                                <h4>💡 使用场景</h4>
+                                <code># 对话很长时，压缩以节省 token
+> /compact
+
+# Claude 会总结之前的对话，保留关键上下文</code>
+                            </div>
+                            <div class="command-tips">
+                                <span class="tip-item info">💡 适合长对话后继续工作</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- /cost -->
+                    <div class="command-card" data-keywords="费用 成本 token">
+                        <div class="command-header">
+                            <code class="command-code">/cost</code>
+                            <div class="command-tags">
+                                <span class="command-tag">基础</span>
+                            </div>
+                        </div>
+                        <div class="command-body">
+                            <p class="command-desc">显示当前会话的 API 调用成本和 token 使用统计。</p>
+                            <div class="command-example">
+                                <h4>💡 输出示例</h4>
+                                <code>> /cost
+
+Token usage:
+- Input:  45,230 tokens
+- Output: 12,450 tokens
+- Total:  57,680 tokens
+- Cost:   $0.35</code>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- /model -->
+                    <div class="command-card" data-keywords="模型 切换 sonnet opus">
+                        <div class="command-header">
+                            <code class="command-code">/model</code>
+                            <div class="command-tags">
+                                <span class="command-tag">基础</span>
+                            </div>
+                        </div>
+                        <div class="command-body">
+                            <p class="command-desc">查看或切换当前使用的模型。</p>
+                            <div class="command-example">
+                                <h4>💡 使用示例</h4>
+                                <code># 查看当前模型
+> /model
+Current model: claude-sonnet-4-20250514
+
+# 切换模型
+> /model opus
+Switched to claude-opus-4-20250514
+
+# 可用模型
+- sonnet (默认，平衡速度和质量)
+- opus (最强，适合复杂任务)
+- haiku (最快，适合简单任务)</code>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 会话管理 -->
+            <section class="section" id="session">
+                <div class="section-header">
+                    <div class="section-icon">💬</div>
+                    <h2 class="section-title">会话管理</h2>
+                </div>
+
+                <div class="command-grid">
+                    <!-- /resume -->
+                    <div class="command-card" data-keywords="恢复 继续 会话">
+                        <div class="command-header">
+                            <code class="command-code">/resume</code>
+                            <div class="command-tags">
+                                <span class="command-tag">常用</span>
+                            </div>
+                        </div>
+                        <div class="command-body">
+                            <p class="command-desc">恢复之前保存的会话，继续之前的工作。</p>
+                            <div class="command-example">
+                                <h4>💡 使用示例</h4>
+                                <code># 恢复最近的会话
+> /resume
+
+# 恢复特定会话（显示列表选择）
+> /resume
+
+# 命令行直接恢复
+$ claude -r
+$ claude --resume "session-id"</code>
+                            </div>
+                            <div class="command-tips">
+                                <span class="tip-item">✅ 会话会自动保存</span>
+                                <span class="tip-item info">💡 适合中断后继续工作</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- /save -->
+                    <div class="command-card" data-keywords="保存 会话">
+                        <div class="command-header">
+                            <code class="command-code">/save</code>
+                            <div class="command-tags">
+                                <span class="command-tag">常用</span>
+                            </div>
+                        </div>
+                        <div class="command-body">
+                            <p class="command-desc">保存当前会话，以便之后恢复。</p>
+                            <div class="command-example">
+                                <h4>💡 使用示例</h4>
+                                <code># 保存当前会话
+> /save
+
+# 会话会被保存，可通过 /resume 恢复</code>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- /fork -->
+                    <div class="command-card" data-keywords="分支 复制 会话">
+                        <div class="command-header">
+                            <code class="command-code">/fork</code>
+                            <div class="command-tags">
+                                <span class="command-tag advanced">进阶</span>
+                            </div>
+                        </div>
+                        <div class="command-body">
+                            <p class="command-desc">创建当前会话的副本，可以在不同方向上继续探索，而不影响原会话。</p>
+                            <div class="command-example">
+                                <h4>💡 使用场景</h4>
+                                <code># 想尝试不同方案时
+> /fork
+
+# 创建分支后，可以尝试不同的实现方式
+# 原会话保持不变</code>
+                            </div>
+                            <div class="command-tips">
+                                <span class="tip-item info">💡 适合对比不同方案</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- /export -->
+                    <div class="command-card" data-keywords="导出 备份">
+                        <div class="command-header">
+                            <code class="command-code">/export</code>
+                            <div class="command-tags">
+                                <span class="command-tag">基础</span>
+                            </div>
+                        </div>
+                        <div class="command-body">
+                            <p class="command-desc">导出当前对话记录为文件。</p>
+                            <div class="command-example">
+                                <h4>💡 使用示例</h4>
+                                <code># 导出对话记录
+> /export
+
+# 会保存为 markdown 或 json 文件</code>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Git 相关 -->
+            <section class="section" id="git">
+                <div class="section-header">
+                    <div class="section-icon">🔀</div>
+                    <h2 class="section-title">Git 相关命令</h2>
+                </div>
+
+                <div class="command-grid">
+                    <!-- /commit -->
+                    <div class="command-card" data-keywords="提交 git commit">
+                        <div class="command-header">
+                            <code class="command-code">/commit</code>
+                            <div class="command-tags">
+                                <span class="command-tag">常用</span>
+                            </div>
+                        </div>
+                        <div class="command-body">
+                            <p class="command-desc">智能创建 Git 提交。Claude 会分析当前的改动，自动生成合适的提交信息。</p>
+                            <div class="command-example">
+                                <h4>💡 使用示例</h4>
+                                <code># 创建提交（自动生成提交信息）
+> /commit
+
+# Claude 会：
+# 1. 运行 git status 查看改动
+# 2. 运行 git diff 分析内容
+# 3. 生成合适的提交信息
+# 4. 执行 git commit</code>
+                            </div>
+                            <div class="command-tips">
+                                <span class="tip-item">✅ 自动分析改动内容</span>
+                                <span class="tip-item">✅ 生成语义化提交信息</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- /pr -->
+                    <div class="command-card" data-keywords="pr pull request">
+                        <div class="command-header">
+                            <code class="command-code">/pr</code>
+                            <div class="command-tags">
+                                <span class="command-tag">常用</span>
+                            </div>
+                        </div>
+                        <div class="command-body">
+                            <p class="command-desc">创建 Pull Request。Claude 会分析当前分支的改动，生成 PR 标题和描述。</p>
+                            <div class="command-example">
+                                <h4>💡 使用示例</h4>
+                                <code># 创建 PR
+> /pr
+
+# Claude 会：
+# 1. 分析当前分支的所有提交
+# 2. 对比与目标分支的差异
+# 3. 生成 PR 标题和描述
+# 4. 使用 gh pr create 创建</code>
+                            </div>
+                            <div class="command-tips">
+                                <span class="tip-item">✅ 需要 GitHub CLI (gh)</span>
+                                <span class="tip-item info">💡 自动生成变更摘要</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- /review -->
+                    <div class="command-card" data-keywords="review 审查 代码">
+                        <div class="command-header">
+                            <code class="command-code">/review</code>
+                            <div class="command-tags">
+                                <span class="command-tag">常用</span>
+                            </div>
+                        </div>
+                        <div class="command-body">
+                            <p class="command-desc">审查当前 PR 或代码改动。Claude 会分析代码变更，检查潜在问题。</p>
+                            <div class="command-example">
+                                <h4>💡 使用示例</h4>
+                                <code># 审查当前改动
+> /review
+
+# 审查特定 PR
+> /review 123
+
+# Claude 会检查：
+# - 代码质量
+# - 潜在 bug
+# - 安全问题
+# - 性能问题
+# - 最佳实践</code>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- /init -->
+                    <div class="command-card" data-keywords="init 初始化 项目">
+                        <div class="command-header">
+                            <code class="command-code">/init</code>
+                            <div class="command-tags">
+                                <span class="command-tag">常用</span>
+                            </div>
+                        </div>
+                        <div class="command-body">
+                            <p class="command-desc">初始化项目的 CLAUDE.md 文件，为 Claude 提供项目上下文。</p>
+                            <div class="command-example">
+                                <h4>💡 使用示例</h4>
+                                <code># 初始化项目配置
+> /init
+
+# Claude 会：
+# 1. 分析项目结构
+# 2. 识别技术栈
+# 3. 生成 CLAUDE.md 文件
+# 4. 包含项目说明、规范等</code>
+                            </div>
+                            <div class="command-tips">
+                                <span class="tip-item">✅ 新项目第一步</span>
+                                <span class="tip-item info">💡 类似 .cursorrules</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 代码审查 -->
+            <section class="section" id="review">
+                <div class="section-header">
+                    <div class="section-icon">🔍</div>
+                    <h2 class="section-title">代码审查与质量</h2>
+                </div>
+
+                <div class="command-grid">
+                    <!-- /security-review -->
+                    <div class="command-card" data-keywords="安全 审查 security">
+                        <div class="command-header">
+                            <code class="command-code">/security-review</code>
+                            <div class="command-tags">
+                                <span class="command-tag">安全</span>
+                            </div>
+                        </div>
+                        <div class="command-body">
+                            <p class="command-desc">对当前改动进行安全审查，检查潜在的安全漏洞。</p>
+                            <div class="command-example">
+                                <h4>💡 检查内容</h4>
+                                <code># 安全审查
+> /security-review
+
+# 检查项目包括：
+# - SQL 注入风险
+# - XSS 漏洞
+# - 敏感信息泄露
+# - 不安全的依赖
+# - API 密钥暴露
+# - 认证/授权问题</code>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- /health -->
+                    <div class="command-card" data-keywords="健康 检查 health">
+                        <div class="command-header">
+                            <code class="command-code">/health</code>
+                            <div class="command-tags">
+                                <span class="command-tag">质量</span>
+                            </div>
+                        </div>
+                        <div class="command-body">
+                            <p class="command-desc">检查项目代码健康状况，运行类型检查、lint、测试等。</p>
+                            <div class="command-example">
+                                <h4>💡 使用示例</h4>
+                                <code># 健康检查
+> /health
+
+# 会运行：
+# - TypeScript 类型检查
+# - ESLint 代码检查
+# - 单元测试
+# - 构建验证
+# 并给出改进建议</code>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- /simplify -->
+                    <div class="command-card" data-keywords="简化 重构 simplify">
+                        <div class="command-header">
+                            <code class="command-code">/simplify</code>
+                            <div class="command-tags">
+                                <span class="command-tag">重构</span>
+                            </div>
+                        </div>
+                        <div class="command-body">
+                            <p class="command-desc">简化最近修改的代码，提高可读性和可维护性。</p>
+                            <div class="command-example">
+                                <h4>💡 使用示例</h4>
+                                <code># 简化代码
+> /simplify
+
+# Claude 会：
+# - 检查重复代码
+# - 简化复杂逻辑
+# - 提取可复用部分
+# - 改进命名</code>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 工作流 -->
+            <section class="section" id="workflow">
+                <div class="section-header">
+                    <div class="section-icon">⚡</div>
+                    <h2 class="section-title">工作流命令</h2>
+                </div>
+
+                <div class="command-grid">
+                    <!-- /loop -->
+                    <div class="command-card" data-keywords="循环 定时 自动">
+                        <div class="command-header">
+                            <code class="command-code">/loop</code>
+                            <div class="command-tags">
+                                <span class="command-tag advanced">进阶</span>
+                            </div>
+                        </div>
+                        <div class="command-body">
+                            <p class="command-desc">设置循环执行任务，可以定时运行某个命令或检查。</p>
+                            <div class="command-example">
+                                <h4>💡 使用示例</h4>
+                                <code># 每 5 分钟检查一次部署状态
+> /loop 5m /check-deploy
+
+# 每 10 分钟运行测试
+> /loop 10m npm test
+
+# 停止循环
+> /loop stop</code>
+                            </div>
+                            <div class="command-params">
+                                <h4>参数格式</h4>
+                                <div class="param-item">
+                                    <span class="param-name">5m</span>
+                                    <span class="param-desc">5 分钟间隔</span>
+                                </div>
+                                <div class="param-item">
+                                    <span class="param-name">1h</span>
+                                    <span class="param-desc">1 小时间隔</span>
+                                </div>
+                                <div class="param-item">
+                                    <span class="param-name">30s</span>
+                                    <span class="param-desc">30 秒间隔</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- /ship -->
+                    <div class="command-card" data-keywords="发布 部署 ship">
+                        <div class="command-header">
+                            <code class="command-code">/ship</code>
+                            <div class="command-tags">
+                                <span class="command-tag">工作流</span>
+                            </div>
+                        </div>
+                        <div class="command-body">
+                            <p class="command-desc">完整的发布工作流：检测基线分支、运行测试、审查代码、更新版本、生成 CHANGELOG。</p>
+                            <div class="command-example">
+                                <h4>💡 执行步骤</h4>
+                                <code>> /ship
+
+# 工作流步骤：
+1. 检测并合并基线分支
+2. 运行所有测试
+3. 审查代码改动
+4. 更新版本号
+5. 更新 CHANGELOG
+6. 创建提交和标签</code>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- /qa -->
+                    <div class="command-card" data-keywords="测试 qa 质量">
+                        <div class="command-header">
+                            <code class="command-code">/qa</code>
+                            <div class="command-tags">
+                                <span class="command-tag">测试</span>
+                            </div>
+                        </div>
+                        <div class="command-body">
+                            <p class="command-desc">系统化测试 Web 应用，发现并修复 bug。</p>
+                            <div class="command-example">
+                                <h4>💡 使用示例</h4>
+                                <code># 运行 QA 测试
+> /qa
+
+# 会测试：
+# - 页面加载
+# - 表单提交
+# - 导航功能
+# - 响应式布局
+# - 错误处理</code>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- /investigate -->
+                    <div class="command-card" data-keywords="调查 调试 investigate">
+                        <div class="command-header">
+                            <code class="command-code">/investigate</code>
+                            <div class="command-tags">
+                                <span class="command-tag">调试</span>
+                            </div>
+                        </div>
+                        <div class="command-body">
+                            <p class="command-desc">系统性调试，进行根因分析。</p>
+                            <div class="command-example">
+                                <h4>💡 调试流程</h4>
+                                <code>> /investigate
+
+# 四个阶段：
+1. 调查 - 收集信息
+2. 分析 - 找出模式
+3. 假设 - 提出可能原因
+4. 验证 - 确认根因</code>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 配置相关 -->
+            <section class="section" id="config">
+                <div class="section-header">
+                    <div class="section-icon">⚙️</div>
+                    <h2 class="section-title">配置与设置</h2>
+                </div>
+
+                <div class="command-grid">
+                    <!-- /config -->
+                    <div class="command-card" data-keywords="配置 设置 config">
+                        <div class="command-header">
+                            <code class="command-code">/config</code>
+                            <div class="command-tags">
+                                <span class="command-tag">配置</span>
+                            </div>
+                        </div>
+                        <div class="command-body">
+                            <p class="command-desc">查看或修改 Claude Code 配置设置。</p>
+                            <div class="command-example">
+                                <h4>💡 使用示例</h4>
+                                <code># 查看当前配置
+> /config
+
+# 修改设置
+> /config set model sonnet
+> /config set theme dark</code>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- /mcp -->
+                    <div class="command-card" data-keywords="mcp 插件 工具">
+                        <div class="command-header">
+                            <code class="command-code">/mcp</code>
+                            <div class="command-tags">
+                                <span class="command-tag advanced">进阶</span>
+                            </div>
+                        </div>
+                        <div class="command-body">
+                            <p class="command-desc">管理 MCP (Model Context Protocol) 服务器，扩展 Claude 的能力。</p>
+                            <div class="command-example">
+                                <h4>💡 使用示例</h4>
+                                <code># 查看 MCP 服务器
+> /mcp list
+
+# 添加 MCP 服务器
+> /mcp add server-name
+
+# 测试 MCP 连接
+> /mcp test server-name</code>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- /permissions -->
+                    <div class="command-card" data-keywords="权限 安全 permissions">
+                        <div class="command-header">
+                            <code class="command-code">/permissions</code>
+                            <div class="command-tags">
+                                <span class="command-tag">安全</span>
+                            </div>
+                        </div>
+                        <div class="command-body">
+                            <p class="command-desc">管理 Claude Code 的权限设置。</p>
+                            <div class="command-example">
+                                <h4>💡 权限类型</h4>
+                                <code># 查看权限设置
+> /permissions
+
+# 权限类型：
+- 文件读取权限
+- 文件写入权限
+- 命令执行权限
+- 网络请求权限</code>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- /statusline -->
+                    <div class="command-card" data-keywords="状态栏 statusline">
+                        <div class="command-header">
+                            <code class="command-code">/statusline</code>
+                            <div class="command-tags">
+                                <span class="command-tag">界面</span>
+                            </div>
+                        </div>
+                        <div class="command-body">
+                            <p class="command-desc">配置 Claude Code 的状态栏显示。</p>
+                            <div class="command-example">
+                                <h4>💡 使用示例</h4>
+                                <code># 设置状态栏
+> /statusline
+
+# 可以配置显示：
+# - 当前模型
+# - Token 使用量
+# - 工作目录
+# - Git 状态</code>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 其他实用命令 -->
+            <section class="section">
+                <div class="section-header">
+                    <div class="section-icon">🛠️</div>
+                    <h2 class="section-title">其他实用命令</h2>
+                </div>
+
+                <div class="command-grid">
+                    <!-- /doctor -->
+                    <div class="command-card" data-keywords="诊断 检查 doctor">
+                        <div class="command-header">
+                            <code class="command-code">/doctor</code>
+                            <div class="command-tags">
+                                <span class="command-tag">诊断</span>
+                            </div>
+                        </div>
+                        <div class="command-body">
+                            <p class="command-desc">诊断 Claude Code 安装和环境问题。</p>
+                            <div class="command-example">
+                                <h4>💡 检查项目</h4>
+                                <code>> /doctor
+
+# 检查：
+# - Claude Code 版本
+# - Node.js 版本
+# - API 连接
+# - 自动更新
+# - MCP 服务器状态</code>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- /update-config -->
+                    <div class="command-card" data-keywords="更新 配置 update-config">
+                        <div class="command-header">
+                            <code class="command-code">/update-config</code>
+                            <div class="command-tags">
+                                <span class="command-tag">配置</span>
+                            </div>
+                        </div>
+                        <div class="command-body">
+                            <p class="command-desc">更新 Claude Code 配置文件（settings.json）。</p>
+                            <div class="command-example">
+                                <h4>💡 使用场景</h4>
+                                <code># 配置自动化行为
+> /update-config
+
+# 可以设置：
+# - 自动行为（hooks）
+# - 权限规则
+# - 环境变量
+# - 模型偏好</code>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- /insights -->
+                    <div class="command-card" data-keywords="统计 分析 insights">
+                        <div class="command-header">
+                            <code class="command-code">/insights</code>
+                            <div class="command-tags">
+                                <span class="command-tag">统计</span>
+                            </div>
+                        </div>
+                        <div class="command-body">
+                            <p class="command-desc">分析你的 Claude Code 使用情况，生成统计报告。</p>
+                            <div class="command-example">
+                                <h4>💡 报告内容</h4>
+                                <code>> /insights
+
+# 包含：
+# - 总使用时长
+# - Token 消耗统计
+# - 常用命令排行
+# - 项目分析记录
+# - 效率建议</code>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- /team-onboarding -->
+                    <div class="command-card" data-keywords="团队 入门 onboarding">
+                        <div class="command-header">
+                            <code class="command-code">/team-onboarding</code>
+                            <div class="command-tags">
+                                <span class="command-tag">团队</span>
+                            </div>
+                        </div>
+                        <div class="command-body">
+                            <p class="command-desc">生成团队入门指南，帮助新成员快速上手。</p>
+                            <div class="command-example">
+                                <h4>💡 使用示例</h4>
+                                <code># 生成入门指南
+> /team-onboarding
+
+# 会根据你的使用记录
+# 生成个性化的上手指南</code>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 命令速查表 -->
+            <section class="section">
+                <div class="section-header">
+                    <div class="section-icon">📋</div>
+                    <h2 class="section-title">命令速查表</h2>
+                </div>
+
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>命令</th>
+                            <th>用途</th>
+                            <th>分类</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><code>/help</code></td><td>显示帮助信息</td><td>基础</td></tr>
+                        <tr><td><code>/clear</code></td><td>清空对话</td><td>基础</td></tr>
+                        <tr><td><code>/compact</code></td><td>压缩对话历史</td><td>基础</td></tr>
+                        <tr><td><code>/cost</code></td><td>查看使用成本</td><td>基础</td></tr>
+                        <tr><td><code>/model</code></td><td>切换模型</td><td>基础</td></tr>
+                        <tr><td><code>/resume</code></td><td>恢复会话</td><td>会话</td></tr>
+                        <tr><td><code>/save</code></td><td>保存会话</td><td>会话</td></tr>
+                        <tr><td><code>/commit</code></td><td>智能提交</td><td>Git</td></tr>
+                        <tr><td><code>/pr</code></td><td>创建 PR</td><td>Git</td></tr>
+                        <tr><td><code>/review</code></td><td>代码审查</td><td>Git</td></tr>
+                        <tr><td><code>/init</code></td><td>初始化项目</td><td>Git</td></tr>
+                        <tr><td><code>/security-review</code></td><td>安全审查</td><td>质量</td></tr>
+                        <tr><td><code>/health</code></td><td>健康检查</td><td>质量</td></tr>
+                        <tr><td><code>/ship</code></td><td>发布工作流</td><td>工作流</td></tr>
+                        <tr><td><code>/qa</code></td><td>QA 测试</td><td>工作流</td></tr>
+                        <tr><td><code>/config</code></td><td>配置设置</td><td>配置</td></tr>
+                        <tr><td><code>/doctor</code></td><td>诊断问题</td><td>工具</td></tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- 使用技巧 -->
+            <section class="section">
+                <div class="tip-box success" style="text-align: center; padding: 40px;">
+                    <div class="tip-content">
+                        <h3 style="font-size: 24px; margin-bottom: 16px;">🎯 斜杠命令使用技巧</h3>
+                        <p style="font-size: 18px; line-height: 2;">
+                            <strong>1. Tab 补全</strong> - 输入 / 后按 Tab 可查看所有命令<br>
+                            <strong>2. 命令组合</strong> - 可以在对话中混合使用命令和自然语言<br>
+                            <strong>3. 查看帮助</strong> - /命令名 --help 查看详细用法
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 页脚 -->
+            <footer style="text-align: center; padding: 48px 0; color: var(--text-light); font-size: 14px;">
+                <p>Claude Code 斜杠命令完整指南 | 2024</p>
+                <p style="margin-top: 8px;">更多资源：<a href="https://github.com/bakakabeckham/claude-code-learning" style="color: var(--primary);">GitHub 仓库</a></p>
+            </footer>
+        </div>
+    </main>
+
+    <script>
+        // 搜索功能
+        function searchCommands() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const cards = document.querySelectorAll('.command-card');
+
+            cards.forEach(card => {
+                const keywords = card.getAttribute('data-keywords') || '';
+                const text = card.textContent.toLowerCase();
+                const matches = text.includes(query) || keywords.includes(query);
+
+                card.style.display = matches || query === '' ? 'block' : 'none';
+            });
+        }
+
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
