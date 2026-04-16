@@ -7,7 +7,8 @@
 ```
 claude-code-learning/
 ├── docs/                    # 详细教程文档
-│   └── claude-code-training.html    # 完整 HTML 培训讲义
+│   ├── claude-code-training.html    # 完整 HTML 培训讲义
+│   └── claude-code-commands.html    # 命令速查手册（新增）
 ├── slides/                  # PPT 演示文稿
 │   └── claude-code-training-slides.html  # 20 页交互式幻灯片
 ├── templates/               # 提示词模板（待补充）
@@ -52,8 +53,11 @@ claude-code-learning/
 
 ### 查看 HTML 培训讲义
 ```bash
-# 直接用浏览器打开
+# 完整培训教程
 open docs/claude-code-training.html
+
+# 命令速查手册（新增）
+open docs/claude-code-commands.html
 ```
 
 ### 查看 PPT 演示文稿
@@ -76,6 +80,7 @@ open slides/claude-code-training-slides.html
 
 ## 📅 更新记录
 
+- 2024-04-16：添加命令速查手册
 - 2024-04-16：初始版本，包含完整培训材料和 PPT
 
 ## 📄 许可证

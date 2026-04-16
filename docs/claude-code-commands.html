@@ -1,0 +1,1350 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude Code CLI 命令速查手册</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #7c3aed;
+            --primary-light: #a78bfa;
+            --primary-dark: #5b21b6;
+            --bg: #f8fafc;
+            --bg-card: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            --code-bg: #1e293b;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.8;
+            font-size: 16px;
+        }
+
+        /* 导航栏 */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            padding: 0 24px;
+            z-index: 1000;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .nav-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+        }
+
+        .nav-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 14px;
+            white-space: nowrap;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .nav-link:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* 主内容 */
+        .main {
+            margin-top: 64px;
+            padding: 40px 24px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Hero */
+        .hero {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 60px 40px;
+            border-radius: 16px;
+            margin-bottom: 48px;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 36px;
+            margin-bottom: 16px;
+            font-weight: 700;
+        }
+
+        .hero p {
+            font-size: 18px;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* 快速搜索 */
+        .search-box {
+            max-width: 600px;
+            margin: 24px auto 0;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 16px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            background: rgba(255,255,255,0.95);
+            color: var(--text);
+        }
+
+        .search-input::placeholder {
+            color: var(--text-light);
+        }
+
+        /* 章节 */
+        .section {
+            margin-bottom: 48px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--primary);
+        }
+
+        .section-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            color: white;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        /* 命令卡片 */
+        .command-grid {
+            display: grid;
+            gap: 20px;
+        }
+
+        .command-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .command-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.15);
+        }
+
+        .command-header {
+            background: var(--code-bg);
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .command-code {
+            font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+            font-size: 16px;
+            color: #22d3ee;
+        }
+
+        .command-tag {
+            background: var(--primary);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .command-body {
+            padding: 20px;
+        }
+
+        .command-desc {
+            font-size: 16px;
+            margin-bottom: 16px;
+            color: var(--text);
+        }
+
+        .command-usage {
+            background: #f1f5f9;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .command-usage h4 {
+            font-size: 14px;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .command-usage code {
+            display: block;
+            font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+            font-size: 14px;
+            color: var(--text);
+            margin: 4px 0;
+        }
+
+        .command-example {
+            background: var(--code-bg);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .command-example h4 {
+            font-size: 14px;
+            color: var(--primary-light);
+            margin-bottom: 8px;
+        }
+
+        .command-example code {
+            display: block;
+            font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+            font-size: 13px;
+            color: #e2e8f0;
+            white-space: pre-wrap;
+            line-height: 1.6;
+        }
+
+        .command-tips {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .tip-item {
+            background: #ecfdf5;
+            color: var(--success);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tip-item.warning {
+            background: #fffbeb;
+            color: var(--warning);
+        }
+
+        .tip-item.info {
+            background: #eff6ff;
+            color: var(--info);
+        }
+
+        /* 参数表格 */
+        .params-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+            font-size: 14px;
+        }
+
+        .params-table th,
+        .params-table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .params-table th {
+            background: #f1f5f9;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .params-table code {
+            background: var(--code-bg);
+            color: #22d3ee;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+            font-size: 13px;
+        }
+
+        /* 提示框 */
+        .tip-box {
+            padding: 20px 24px;
+            border-radius: 12px;
+            margin: 24px 0;
+            display: flex;
+            gap: 16px;
+        }
+
+        .tip-box.info {
+            background: #eff6ff;
+            border-left: 4px solid var(--info);
+        }
+
+        .tip-box.success {
+            background: #ecfdf5;
+            border-left: 4px solid var(--success);
+        }
+
+        .tip-box.warning {
+            background: #fffbeb;
+            border-left: 4px solid var(--warning);
+        }
+
+        .tip-box.danger {
+            background: #fef2f2;
+            border-left: 4px solid var(--danger);
+        }
+
+        .tip-icon {
+            font-size: 24px;
+        }
+
+        .tip-content {
+            flex: 1;
+        }
+
+        .tip-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        /* 快捷键表格 */
+        .shortcuts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+        }
+
+        .shortcut-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .shortcut-key {
+            background: var(--code-bg);
+            color: #22d3ee;
+            font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+            font-size: 14px;
+            padding: 8px 16px;
+            border-radius: 6px;
+            white-space: nowrap;
+        }
+
+        .shortcut-desc {
+            flex: 1;
+            color: var(--text-light);
+        }
+
+        /* 分类标签 */
+        .category-tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .category-tab {
+            padding: 10px 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+
+        .category-tab:hover,
+        .category-tab.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* 对比表格 */
+        .compare-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+        }
+
+        .compare-table th,
+        .compare-table td {
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .compare-table th {
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+        }
+
+        .compare-table tr:hover td {
+            background: #f8fafc;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 28px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .shortcut-key {
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+        }
+
+        /* 打印优化 */
+        @media print {
+            .nav {
+                display: none;
+            }
+
+            .main {
+                margin-top: 0;
+            }
+
+            .command-card {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="nav">
+        <div class="nav-inner">
+            <div class="nav-title">📘 Claude Code 命令速查手册</div>
+            <div class="nav-links">
+                <a href="#basic" class="nav-link">基础命令</a>
+                <a href="#file" class="nav-link">文件操作</a>
+                <a href="#project" class="nav-link">项目管理</a>
+                <a href="#config" class="nav-link">配置相关</a>
+                <a href="#shortcuts" class="nav-link">快捷键</a>
+                <a href="#tips" class="nav-link">使用技巧</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主内容 -->
+    <main class="main">
+        <div class="container">
+            <!-- Hero -->
+            <div class="hero">
+                <h1>🚀 Claude Code CLI 命令速查手册</h1>
+                <p>最完整的 Claude Code 命令参考指南，包含详细用法、参数说明和实战示例</p>
+                <div class="search-box">
+                    <input type="text" class="search-input" placeholder="🔍 搜索命令... (输入命令名称或关键词)" id="searchInput" onkeyup="searchCommands()">
+                </div>
+            </div>
+
+            <!-- 基础命令 -->
+            <section class="section" id="basic">
+                <div class="section-header">
+                    <div class="section-icon">🏠</div>
+                    <h2 class="section-title">基础命令</h2>
+                </div>
+
+                <div class="command-grid">
+                    <!-- claude -->
+                    <div class="command-card" data-keywords="启动 开始 运行">
+                        <div class="command-header">
+                            <code class="command-code">claude</code>
+                            <span class="command-tag">最常用</span>
+                        </div>
+                        <div class="command-body">
+                            <p class="command-desc">启动 Claude Code 交互式会话。这是最基本也是最常用的命令，在项目目录下运行即可开始与 Claude 对话。</p>
+
+                            <div class="command-usage">
+                                <h4>📋 语法</h4>
+                                <code>claude [选项]</code>
+                            </div>
+
+                            <div class="command-example">
+                                <h4>💡 示例</h4>
+                                <code># 在当前目录启动 Claude Code
+claude
+
+# 带提示词直接启动
+claude "请帮我分析这个项目结构"
+
+# 指定工作目录
+claude --cwd /path/to/project</code>
+                            </div>
+
+                            <div class="command-tips">
+                                <span class="tip-item">✅ 首次运行会要求输入 API Key</span>
+                                <span class="tip-item info">💡 在项目根目录下启动效果最佳</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- claude --version -->
+                    <div class="command-card" data-keywords="版本 检查 更新">
+                        <div class="command-header">
+                            <code class="command-code">claude --version</code>
+                            <span class="command-tag">基础</span>
+                        </div>
+                        <div class="command-body">
+                            <p class="command-desc">查看当前安装的 Claude Code 版本号，用于确认安装成功或检查是否需要更新。</p>
+
+                            <div class="command-example">
+                                <h4>💡 示例</h4>
+                                <code>$ claude --version
+claude-code v1.0.0</code>
+                            </div>
+
+                            <div class="command-tips">
+                                <span class="tip-item">✅ 安装后第一步验证</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- claude --help -->
+                    <div class="command-card" data-keywords="帮助 文档 说明">
+                        <div class="command-header">
+                            <code class="command-code">claude --help</code>
+                            <span class="command-tag">基础</span>
+                        </div>
+                        <div class="command-body">
+                            <p class="command-desc">显示所有可用命令和选项的帮助信息，当你忘记某个命令时非常有用。</p>
+
+                            <div class="command-example">
+                                <h4>💡 示例</h4>
+                                <code>$ claude --help
+Usage: claude [options] [prompt]
+
+Options:
+  -v, --version    显示版本号
+  -h, --help       显示帮助信息
+  --cwd <path>     指定工作目录
+  ...</code>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- claude update -->
+                    <div class="command-card" data-keywords="更新 升级 版本">
+                        <div class="command-header">
+                            <code class="command-code">claude update</code>
+                            <span class="command-tag">维护</span>
+                        </div>
+                        <div class="command-body">
+                            <p class="command-desc">更新 Claude Code 到最新版本。建议定期运行以获取新功能和 bug 修复。</p>
+
+                            <div class="command-example">
+                                <h4>💡 示例</h4>
+                                <code># 更新到最新版本
+claude update
+
+# 或者使用 npm 更新
+npm update -g @anthropic-ai/claude-code</code>
+                            </div>
+
+                            <div class="command-tips">
+                                <span class="tip-item warning">⚠️ 更新前建议保存当前工作</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 文件操作 -->
+            <section class="section" id="file">
+                <div class="section-header">
+                    <div class="section-icon">📁</div>
+                    <h2 class="section-title">文件操作命令（交互式）</h2>
+                </div>
+
+                <div class="tip-box info">
+                    <div class="tip-icon">💡</div>
+                    <div class="tip-content">
+                        <div class="tip-title">重要说明</div>
+                        <p>Claude Code 主要是交互式工具，大部分操作通过自然语言对话完成。以下是在对话中常用的文件操作提示词模板。</p>
+                    </div>
+                </div>
+
+                <div class="command-grid">
+                    <!-- 读取文件 -->
+                    <div class="command-card" data-keywords="读取 查看 文件">
+                        <div class="command-header">
+                            <code class="command-code">读取文件</code>
+                            <span class="command-tag">提示词</span>
+                        </div>
+                        <div class="command-body">
+                            <p class="command-desc">让 Claude 读取并分析指定的文件内容。</p>
+
+                            <div class="command-example">
+                                <h4>💡 示例提示词</h4>
+                                <code># 读取单个文件
+请读取 index.html 的内容，告诉我这个页面做了什么
+
+# 读取多个文件
+请读取 src/ 目录下的所有 .js 文件
+
+# 读取并解释
+请读取 app.js，解释主要函数的作用</code>
+                            </div>
+
+                            <div class="command-tips">
+                                <span class="tip-item">✅ Claude 会自动使用 Read 工具</span>
+                                <span class="tip-item info">💡 支持读取图片文件</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 创建文件 -->
+                    <div class="command-card" data-keywords="创建 新建 文件">
+                        <div class="command-header">
+                            <code class="command-code">创建文件</code>
+                            <span class="command-tag">提示词</span>
+                        </div>
+                        <div class="command-body">
+                            <p class="command-desc">让 Claude 创建新的文件并写入内容。</p>
+
+                            <div class="command-example">
+                                <h4>💡 示例提示词</h4>
+                                <code># 创建单个文件
+请创建 styles.css 文件，包含基础的页面样式
+
+# 创建多个文件
+请创建以下文件：
+1. index.html - 主页面
+2. styles.css - 样式文件
+3. app.js - 脚本文件
+
+# 创建目录结构
+请创建 src/components/ 目录，并添加 Header.jsx 文件</code>
+                            </div>
+
+                            <div class="command-tips">
+                                <span class="tip-item">✅ 会自动创建不存在的目录</span>
+                                <span class="tip-item warning">⚠️ 会覆盖已存在的文件</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 修改文件 -->
+                    <div class="command-card" data-keywords="修改 编辑 更新">
+                        <div class="command-header">
+                            <code class="command-code">修改文件</code>
+                            <span class="command-tag">提示词</span>
+                        </div>
+                        <div class="command-body">
+                            <p class="command-desc">让 Claude 修改已存在的文件内容。</p>
+
+                            <div class="command-example">
+                                <h4>💡 示例提示词</h4>
+                                <code># 简单修改
+请修改 index.html，把标题改成"我的项目"
+
+# 添加内容
+请在 app.js 中添加一个 debounce 函数
+
+# 重构代码
+请重构 app.js 中的 handleSubmit 函数，使其更简洁
+
+# 批量修改
+请修改所有 .jsx 文件，把 className="btn" 改成 className="button"</code>
+                            </div>
+
+                            <div class="command-tips">
+                                <span class="tip-item">✅ 修改前会先读取文件</span>
+                                <span class="tip-item info">💡 使用 Edit 工具进行精确替换</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 查找文件 -->
+                    <div class="command-card" data-keywords="查找 搜索 文件">
+                        <div class="command-header">
+                            <code class="command-code">查找文件</code>
+                            <span class="command-tag">提示词</span>
+                        </div>
+                        <div class="command-body">
+                            <p class="command-desc">让 Claude 在项目中搜索文件或内容。</p>
+
+                            <div class="command-example">
+                                <h4>💡 示例提示词</h4>
+                                <code># 按名称查找文件
+请找到所有 .test.js 文件
+
+# 按内容搜索
+请在项目中搜索 "TODO" 注释
+
+# 按模式查找
+请找到所有以 "use" 开头的函数定义
+
+# 复杂搜索
+请在 src/ 目录下找到所有使用了 useState 的文件</code>
+                            </div>
+
+                            <div class="command-tips">
+                                <span class="tip-item">✅ 使用 Glob 工具按模式匹配</span>
+                                <span class="tip-item">✅ 使用 Grep 工具按内容搜索</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 删除文件 -->
+                    <div class="command-card" data-keywords="删除 移除 文件">
+                        <div class="command-header">
+                            <code class="command-code">删除文件</code>
+                            <span class="command-tag">提示词</span>
+                        </div>
+                        <div class="command-body">
+                            <p class="command-desc">让 Claude 删除指定的文件或目录。</p>
+
+                            <div class="command-example">
+                                <h4>💡 示例提示词</h4>
+                                <code># 删除单个文件
+请删除 temp.js 文件
+
+# 删除目录
+请删除 dist/ 目录
+
+# 删除匹配的文件
+请删除所有 .log 文件</code>
+                            </div>
+
+                            <div class="command-tips">
+                                <span class="tip-item warning">⚠️ 删除操作不可恢复</span>
+                                <span class="tip-item danger">🚨 执行前会要求确认</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 项目管理 -->
+            <section class="section" id="project">
+                <div class="section-header">
+                    <div class="section-icon">📊</div>
+                    <h2 class="section-title">项目管理命令</h2>
+                </div>
+
+                <div class="command-grid">
+                    <!-- 项目分析 -->
+                    <div class="command-card" data-keywords="分析 项目 结构">
+                        <div class="command-header">
+                            <code class="command-code">项目分析</code>
+                            <span class="command-tag">常用</span>
+                        </div>
+                        <div class="command-body">
+                            <p class="command-desc">让 Claude 分析整个项目的结构和技术栈。</p>
+
+                            <div class="command-example">
+                                <h4>💡 示例提示词</h4>
+                                <code># 分析项目结构
+请分析当前项目的结构，告诉我：
+1. 这是什么类型的项目
+2. 使用了什么技术栈
+3. 主要文件和目录的作用
+4. 项目的入口文件
+
+# 技术栈识别
+请识别这个项目使用的所有依赖库
+
+# 架构分析
+请分析这个项目的架构设计</code>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Git 操作 -->
+                    <div class="command-card" data-keywords="git 提交 版本">
+                        <div class="command-header">
+                            <code class="command-code">Git 操作</code>
+                            <span class="command-tag">常用</span>
+                        </div>
+                        <div class="command-body">
+                            <p class="command-desc">让 Claude 帮你执行 Git 命令管理版本。</p>
+
+                            <div class="command-example">
+                                <h4>💡 示例提示词</h4>
+                                <code># 查看状态
+请运行 git status，告诉我当前有哪些改动
+
+# 提交代码
+请帮我提交当前的改动，提交信息是"添加登录功能"
+
+# 创建分支
+请创建一个新分支 feature/login
+
+# 查看 log
+请显示最近 5 条 git 提交记录</code>
+                            </div>
+
+                            <div class="command-tips">
+                                <span class="tip-item">✅ Claude 使用 Bash 工具执行命令</span>
+                                <span class="tip-item warning">⚠️ 危险操作会要求确认</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 依赖管理 -->
+                    <div class="command-card" data-keywords="npm 依赖 安装">
+                        <div class="command-header">
+                            <code class="command-code">依赖管理</code>
+                            <span class="command-tag">常用</span>
+                        </div>
+                        <div class="command-body">
+                            <p class="command-desc">让 Claude 帮你管理项目依赖。</p>
+
+                            <div class="command-example">
+                                <h4>💡 示例提示词</h4>
+                                <code># 安装依赖
+请运行 npm install 安装项目依赖
+
+# 添加依赖
+请安装 axios 库
+
+# 添加开发依赖
+请安装 typescript 作为开发依赖
+
+# 查看过期依赖
+请检查哪些依赖需要更新</code>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 运行脚本 -->
+                    <div class="command-card" data-keywords="运行 启动 脚本">
+                        <div class="command-header">
+                            <code class="command-code">运行脚本</code>
+                            <span class="command-tag">常用</span>
+                        </div>
+                        <div class="command-body">
+                            <p class="command-desc">让 Claude 运行 package.json 中定义的脚本或自定义命令。</p>
+
+                            <div class="command-example">
+                                <h4>💡 示例提示词</h4>
+                                <code># 启动开发服务器
+请运行 npm run dev
+
+# 构建项目
+请运行构建命令
+
+# 运行测试
+请运行所有测试
+
+# 执行自定义命令
+请执行 node scripts/migrate.js</code>
+                            </div>
+
+                            <div class="command-tips">
+                                <span class="tip-item info">💡 长时间运行的命令可在后台执行</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 配置相关 -->
+            <section class="section" id="config">
+                <div class="section-header">
+                    <div class="section-icon">⚙️</div>
+                    <h2 class="section-title">配置与设置</h2>
+                </div>
+
+                <div class="command-grid">
+                    <!-- API Key -->
+                    <div class="command-card" data-keywords="api key 密钥 配置">
+                        <div class="command-header">
+                            <code class="command-code">API Key 配置</code>
+                            <span class="command-tag">首次使用</span>
+                        </div>
+                        <div class="command-body">
+                            <p class="command-desc">配置 Anthropic API Key，首次使用时必需。</p>
+
+                            <div class="command-example">
+                                <h4>💡 配置方式</h4>
+                                <code># 方式 1：首次启动时自动提示输入
+claude
+# 会提示：Enter your Anthropic API key:
+
+# 方式 2：设置环境变量
+export ANTHROPIC_API_KEY="your-api-key-here"
+
+# 方式 3：在 .env 文件中配置
+ANTHROPIC_API_KEY=your-api-key-here</code>
+                            </div>
+
+                            <div class="command-tips">
+                                <span class="tip-item warning">⚠️ API Key 不要分享给他人</span>
+                                <span class="tip-item info">💡 可在 https://console.anthropic.com 获取</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CLAUDE.md -->
+                    <div class="command-card" data-keywords="claude.md 项目指令 配置">
+                        <div class="command-header">
+                            <code class="command-code">CLAUDE.md 配置</code>
+                            <span class="command-tag">进阶</span>
+                        </div>
+                        <div class="command-body">
+                            <p class="command-desc">在项目根目录创建 CLAUDE.md 文件，为 Claude 提供项目特定的指令和上下文。</p>
+
+                            <div class="command-example">
+                                <h4>💡 CLAUDE.md 示例</h4>
+                                <code># 项目：My App
+
+## 技术栈
+- React 18 + TypeScript
+- Tailwind CSS
+- Vite
+
+## 代码规范
+- 使用函数组件和 Hooks
+- 组件文件使用 PascalCase 命名
+- 样式使用 Tailwind 类名
+
+## 注意事项
+- 所有 API 调用都在 src/services/ 目录
+- 测试文件与源文件同目录</code>
+                            </div>
+
+                            <div class="command-tips">
+                                <span class="tip-item">✅ Claude 启动时会自动读取</span>
+                                <span class="tip-item info">💡 类似 .cursorrules 文件</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 权限配置 -->
+                    <div class="command-card" data-keywords="权限 安全 配置">
+                        <div class="command-header">
+                            <code class="command-code">权限与安全</code>
+                            <span class="command-tag">进阶</span>
+                        </div>
+                        <div class="command-body">
+                            <p class="command-desc">Claude Code 有多层安全机制保护你的系统。</p>
+
+                            <table class="params-table">
+                                <tr>
+                                    <th>权限类型</th>
+                                    <th>说明</th>
+                                </tr>
+                                <tr>
+                                    <td><code>读取文件</code></td>
+                                    <td>默认允许读取项目目录内的文件</td>
+                                </tr>
+                                <tr>
+                                    <td><code>写入文件</code></td>
+                                    <td>修改文件前会显示 diff 供确认</td>
+                                </tr>
+                                <tr>
+                                    <td><code>执行命令</code></td>
+                                    <td>危险命令（删除、强制推送等）需要确认</td>
+                                </tr>
+                                <tr>
+                                    <td><code>网络请求</code></td>
+                                    <td>默认禁止，需要明确授权</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 快捷键 -->
+            <section class="section" id="shortcuts">
+                <div class="section-header">
+                    <div class="section-icon">⌨️</div>
+                    <h2 class="section-title">交互式快捷键</h2>
+                </div>
+
+                <div class="tip-box info">
+                    <div class="tip-icon">💡</div>
+                    <div class="tip-content">
+                        <div class="tip-title">快捷键说明</div>
+                        <p>以下快捷键在 Claude Code 交互式会话中使用，可以提高操作效率。</p>
+                    </div>
+                </div>
+
+                <div class="shortcuts-grid">
+                    <div class="shortcut-card">
+                        <span class="shortcut-key">Ctrl + C</span>
+                        <span class="shortcut-desc">中断当前操作 / 退出会话</span>
+                    </div>
+                    <div class="shortcut-card">
+                        <span class="shortcut-key">Ctrl + D</span>
+                        <span class="shortcut-desc">退出 Claude Code 会话</span>
+                    </div>
+                    <div class="shortcut-card">
+                        <span class="shortcut-key">↑ / ↓</span>
+                        <span class="shortcut-desc">浏览历史输入记录</span>
+                    </div>
+                    <div class="shortcut-card">
+                        <span class="shortcut-key">Tab</span>
+                        <span class="shortcut-desc">自动补全文件路径</span>
+                    </div>
+                    <div class="shortcut-card">
+                        <span class="shortcut-key">Ctrl + L</span>
+                        <span class="shortcut-desc">清屏</span>
+                    </div>
+                    <div class="shortcut-card">
+                        <span class="shortcut-key">Ctrl + R</span>
+                        <span class="shortcut-desc">搜索历史命令</span>
+                    </div>
+                    <div class="shortcut-card">
+                        <span class="shortcut-key">Enter</span>
+                        <span class="shortcut-desc">发送消息 / 确认操作</span>
+                    </div>
+                    <div class="shortcut-card">
+                        <span class="shortcut-key">Shift + Enter</span>
+                        <span class="shortcut-desc">输入多行文本（部分终端支持）</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 使用技巧 -->
+            <section class="section" id="tips">
+                <div class="section-header">
+                    <div class="section-icon">💡</div>
+                    <h2 class="section-title">高效使用技巧</h2>
+                </div>
+
+                <div class="command-grid">
+                    <!-- 技巧 1 -->
+                    <div class="command-card">
+                        <div class="command-header">
+                            <code class="command-code">明确指定文件路径</code>
+                            <span class="command-tag">效率</span>
+                        </div>
+                        <div class="command-body">
+                            <div class="compare-table">
+                                <table class="compare-table">
+                                    <tr>
+                                        <th>❌ 模糊</th>
+                                        <th>✅ 明确</th>
+                                    </tr>
+                                    <tr>
+                                        <td>"改一下那个文件"</td>
+                                        <td>"修改 src/components/Header.jsx"</td>
+                                    </tr>
+                                    <tr>
+                                        <td>"把样式改了"</td>
+                                        <td>"修改 styles/main.css 的第 15-20 行"</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 技巧 2 -->
+                    <div class="command-card">
+                        <div class="command-header">
+                            <code class="command-code">分步而非一次完成</code>
+                            <span class="command-tag">质量</span>
+                        </div>
+                        <div class="command-body">
+                            <div class="command-example">
+                                <h4>❌ 不推荐：一次性要求太多</h4>
+                                <code>请帮我创建一个完整的用户管理页面，
+包含列表、搜索、新增、编辑、删除功能，
+还要有表单验证和错误提示...</code>
+                            </div>
+                            <div class="command-example">
+                                <h4>✅ 推荐：分步进行</h4>
+                                <code># 第一步
+请创建用户列表页面的基础结构
+
+# 第二步
+请添加搜索功能
+
+# 第三步
+请添加新增用户的弹窗</code>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 技巧 3 -->
+                    <div class="command-card">
+                        <div class="command-header">
+                            <code class="command-code">提供上下文信息</code>
+                            <span class="command-tag">质量</span>
+                        </div>
+                        <div class="command-body">
+                            <div class="command-example">
+                                <h4>💡 好的提示词结构</h4>
+                                <code>背景：这是一个 React + TypeScript 项目
+目标：添加一个用户头像组件
+要求：
+1. 支持圆形和方形两种样式
+2. 默认显示用户名首字母
+3. 支持传入图片 URL
+文件位置：src/components/Avatar.tsx
+样式方案：使用 Tailwind CSS</code>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 技巧 4 -->
+                    <div class="command-card">
+                        <div class="command-header">
+                            <code class="command-code">利用 Git 保护代码</code>
+                            <span class="command-tag">安全</span>
+                        </div>
+                        <div class="command-body">
+                            <p class="command-desc">在让 Claude 修改代码前，先提交当前状态，方便回退。</p>
+                            <div class="command-example">
+                                <h4>💡 推荐工作流</h4>
+                                <code># 修改前
+git add . && git commit -m "保存当前状态"
+
+# 让 Claude 修改代码
+"请重构 app.js 中的登录逻辑"
+
+# 检查改动
+git diff
+
+# 如果满意，提交
+git add . && git commit -m "重构登录逻辑"
+
+# 如果不满意，回退
+git checkout .</code>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 技巧 5 -->
+                    <div class="command-card">
+                        <div class="command-header">
+                            <code class="command-code">让 Claude 解释代码</code>
+                            <span class="command-tag">学习</span>
+                        </div>
+                        <div class="command-body">
+                            <p class="command-desc">不仅是让 Claude 写代码，也要让它解释代码，这样你能学到更多。</p>
+                            <div class="command-example">
+                                <h4>💡 示例提示词</h4>
+                                <code># 解释某段代码
+请解释 src/utils/date.js 中 format 函数的实现原理
+
+# 解释项目架构
+请解释这个项目的数据流向
+
+# 解释某个概念
+请解释 React 中 useEffect 的依赖数组是如何工作的</code>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 技巧 6 -->
+                    <div class="command-card">
+                        <div class="command-header">
+                            <code class="command-code">处理报错信息</code>
+                            <span class="command-tag">调试</span>
+                        </div>
+                        <div class="command-body">
+                            <p class="command-desc">遇到报错时，提供完整的信息给 Claude。</p>
+                            <div class="command-example">
+                                <h4>💡 报错处理模板</h4>
+                                <code>我遇到一个错误，请帮我分析：
+
+错误信息：
+[粘贴完整的错误堆栈]
+
+我正在做什么：
+[描述你的操作]
+
+期望结果：
+[描述你期望发生什么]
+
+实际结果：
+[描述实际发生了什么]
+
+相关代码文件：
+[告诉 Claude 查看哪些文件]</code>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 常见问题 -->
+            <section class="section">
+                <div class="section-header">
+                    <div class="section-icon">❓</div>
+                    <h2 class="section-title">常见问题</h2>
+                </div>
+
+                <div class="command-grid">
+                    <div class="command-card">
+                        <div class="command-body">
+                            <h4 style="color: var(--primary); margin-bottom: 12px;">Q: Claude Code 能操作项目外的文件吗？</h4>
+                            <p>A: 默认情况下，Claude Code 只能操作当前工作目录及其子目录下的文件。如果需要访问其他目录，需要明确指定完整路径。</p>
+                        </div>
+                    </div>
+
+                    <div class="command-card">
+                        <div class="command-body">
+                            <h4 style="color: var(--primary); margin-bottom: 12px;">Q: 如何让 Claude Code 使用特定的模型？</h4>
+                            <p>A: Claude Code 会自动使用最适合的模型。目前默认使用 Claude 3.5 Sonnet，平衡了速度和质量。可通过配置或对话中指定需求来调整。</p>
+                        </div>
+                    </div>
+
+                    <div class="command-card">
+                        <div class="command-body">
+                            <h4 style="color: var(--primary); margin-bottom: 12px;">Q: Claude Code 会自动保存我的代码吗？</h4>
+                            <p>A: Claude Code 修改文件时会直接保存。建议使用 Git 版本控制，这样可以随时查看和回退改动。</p>
+                        </div>
+                    </div>
+
+                    <div class="command-card">
+                        <div class="command-body">
+                            <h4 style="color: var(--primary); margin-bottom: 12px;">Q: 对话历史会保存吗？</h4>
+                            <p>A: 当前会话中的对话会保持在上下文中。但每次新启动 Claude Code 都是新的会话，之前的对话不会自动恢复。建议重要的决策和代码用 Git 或文档保存。</p>
+                        </div>
+                    </div>
+
+                    <div class="command-card">
+                        <div class="command-body">
+                            <h4 style="color: var(--primary); margin-bottom: 12px;">Q: 如何处理敏感信息？</h4>
+                            <p>A: 不要在对话中分享敏感信息（API Key、密码、密钥等）。建议使用环境变量或专门的配置文件管理敏感信息，并确保这些文件在 .gitignore 中。</p>
+                        </div>
+                    </div>
+
+                    <div class="command-card">
+                        <div class="command-body">
+                            <h4 style="color: var(--primary); margin-bottom: 12px;">Q: 遇到 "permission denied" 错误怎么办？</h4>
+                            <p>A: 这通常是因为 Claude Code 没有权限操作某个文件或目录。检查文件权限，或尝试使用 sudo 运行（不推荐，仅作为最后手段）。</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 总结 -->
+            <section class="section">
+                <div class="tip-box success" style="text-align: center; padding: 40px;">
+                    <div class="tip-content">
+                        <h3 style="font-size: 24px; margin-bottom: 16px;">🎯 记住三个核心原则</h3>
+                        <p style="font-size: 18px; line-height: 2;">
+                            <strong>1. 明确具体</strong> - 指定文件路径、行号、具体需求<br>
+                            <strong>2. 分步进行</strong> - 一次一个任务，完成验证后再继续<br>
+                            <strong>3. 持续验证</strong> - 每次改动都要检查，用 Git 保护代码
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 页脚 -->
+            <footer style="text-align: center; padding: 48px 0; color: var(--text-light); font-size: 14px;">
+                <p>Claude Code CLI 命令速查手册 | 2024</p>
+                <p style="margin-top: 8px;">更多资源：<a href="https://github.com/bakakabeckham/claude-code-learning" style="color: var(--primary);">GitHub 仓库</a></p>
+            </footer>
+        </div>
+    </main>
+
+    <script>
+        // 搜索功能
+        function searchCommands() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const cards = document.querySelectorAll('.command-card');
+
+            cards.forEach(card => {
+                const keywords = card.getAttribute('data-keywords') || '';
+                const text = card.textContent.toLowerCase();
+                const matches = text.includes(query) || keywords.includes(query);
+
+                card.style.display = matches || query === '' ? 'block' : 'none';
+            });
+        }
+
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // 导航栏滚动效果
+        let lastScroll = 0;
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('.nav');
+            const currentScroll = window.pageYOffset;
+
+            if (currentScroll > lastScroll && currentScroll > 100) {
+                nav.style.transform = 'translateY(-100%)';
+            } else {
+                nav.style.transform = 'translateY(0)';
+            }
+            lastScroll = currentScroll;
+        });
+    </script>
+</body>
+</html>
