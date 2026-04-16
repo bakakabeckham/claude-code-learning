@@ -1,0 +1,1343 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude Code CLI 零基础实战训练营 - PPT</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #7c3aed;
+            --primary-light: #a78bfa;
+            --primary-dark: #5b21b6;
+            --bg: #1e293b;
+            --bg-card: #334155;
+            --text: #f1f5f9;
+            --text-light: #94a3b8;
+            --accent: #22d3ee;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            overflow: hidden;
+        }
+
+        /* 幻灯片容器 */
+        .slides-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        .slide {
+            width: 100%;
+            height: 100%;
+            display: none;
+            padding: 60px 80px;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .slide.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 幻灯片类型 */
+        .slide-cover {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 50%, var(--primary-light) 100%);
+        }
+
+        .slide-content {
+            justify-content: flex-start;
+        }
+
+        .slide-end {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+        }
+
+        /* 封面样式 */
+        .cover-title {
+            font-size: 56px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .cover-subtitle {
+            font-size: 24px;
+            opacity: 0.9;
+            margin-bottom: 48px;
+        }
+
+        .cover-tags {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .cover-tag {
+            background: rgba(255,255,255,0.2);
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-size: 16px;
+            backdrop-filter: blur(10px);
+        }
+
+        /* 内容页样式 */
+        .slide-header {
+            margin-bottom: 40px;
+        }
+
+        .slide-number {
+            font-size: 14px;
+            color: var(--accent);
+            margin-bottom: 8px;
+            letter-spacing: 2px;
+        }
+
+        .slide-title {
+            font-size: 42px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--text) 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .slide-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* 卡片网格 */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        .card-grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+        }
+
+        .card-grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .card-icon {
+            font-size: 36px;
+            margin-bottom: 16px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--accent);
+        }
+
+        .card-text {
+            font-size: 14px;
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+
+        /* 表格 */
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--bg-card);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .table th {
+            background: var(--primary);
+            padding: 16px 20px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .table td {
+            padding: 14px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* 列表 */
+        .list {
+            list-style: none;
+        }
+
+        .list li {
+            padding: 12px 0;
+            padding-left: 32px;
+            position: relative;
+            font-size: 18px;
+        }
+
+        .list li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+            font-size: 20px;
+        }
+
+        .list-check li::before {
+            content: "✓";
+            color: var(--success);
+        }
+
+        .list-num {
+            counter-reset: num;
+        }
+
+        .list-num li::before {
+            counter-increment: num;
+            content: counter(num) ".";
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        /* 代码块 */
+        .code {
+            background: #0f172a;
+            border-radius: 12px;
+            padding: 20px 24px;
+            font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            margin: 16px 0;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* 提示框 */
+        .tip {
+            background: rgba(124, 58, 237, 0.2);
+            border-left: 4px solid var(--primary);
+            padding: 20px 24px;
+            border-radius: 0 12px 12px 0;
+            margin: 20px 0;
+        }
+
+        .tip-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--accent);
+        }
+
+        /* 流程图 */
+        .flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .flow-item {
+            background: var(--bg-card);
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            padding: 16px 24px;
+            text-align: center;
+        }
+
+        .flow-item h5 {
+            color: var(--accent);
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .flow-item p {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+
+        .flow-arrow {
+            font-size: 28px;
+            color: var(--primary);
+        }
+
+        /* 对比框 */
+        .compare {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .compare-bad {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--danger);
+            border-radius: 12px;
+            padding: 24px;
+        }
+
+        .compare-good {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--success);
+            border-radius: 12px;
+            padding: 24px;
+        }
+
+        .compare-bad h4 {
+            color: var(--danger);
+            margin-bottom: 12px;
+        }
+
+        .compare-good h4 {
+            color: var(--success);
+            margin-bottom: 12px;
+        }
+
+        /* 大字 */
+        .big-text {
+            font-size: 28px;
+            line-height: 1.8;
+        }
+
+        .highlight {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        /* 两栏布局 */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 48px;
+        }
+
+        .two-col-left {
+            padding-right: 24px;
+            border-right: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* 导航控制 */
+        .nav-controls {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            gap: 12px;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            width: 50px;
+            height: 50px;
+            background: var(--primary);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-btn:hover {
+            background: var(--primary-light);
+            transform: scale(1.1);
+        }
+
+        /* 页码指示 */
+        .page-indicator {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 100;
+        }
+
+        .page-dot {
+            width: 10px;
+            height: 10px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .page-dot.active {
+            background: var(--accent);
+            transform: scale(1.3);
+        }
+
+        /* 演讲者备注（按 S 键显示） */
+        .speaker-notes {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #0f172a;
+            padding: 20px 40px;
+            border-top: 2px solid var(--primary);
+            display: none;
+            z-index: 200;
+        }
+
+        .speaker-notes.show {
+            display: block;
+        }
+
+        .speaker-notes h4 {
+            color: var(--accent);
+            margin-bottom: 8px;
+        }
+
+        .speaker-notes p {
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        /* 帮助提示 */
+        .help-hint {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.5);
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 12px;
+            color: var(--text-light);
+            z-index: 100;
+        }
+
+        /* 结束页 */
+        .end-title {
+            font-size: 48px;
+            margin-bottom: 32px;
+        }
+
+        .end-text {
+            font-size: 24px;
+            opacity: 0.9;
+            margin-bottom: 48px;
+        }
+
+        /* 响应式 */
+        @media (max-width: 1024px) {
+            .slide {
+                padding: 40px;
+            }
+
+            .cover-title {
+                font-size: 36px;
+            }
+
+            .slide-title {
+                font-size: 28px;
+            }
+
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .card-grid-2, .compare, .two-col {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* 打印隐藏控制元素 */
+        @media print {
+            .nav-controls, .page-indicator, .help-hint, .speaker-notes {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="slides-container">
+        <!-- 第1页：封面 -->
+        <div class="slide slide-cover active" data-notes="大家好，欢迎参加 Claude Code CLI 零基础实战训练营。这个训练营专门为新手设计，不需要你有编程基础，也不需要你熟悉命令行。在接下来的时间里，我会带大家从零开始认识这个工具，并且通过实际操作，让每个人都能完成一个属于自己的小项目。">
+            <h1 class="cover-title">🎯 Claude Code CLI<br>零基础实战训练营</h1>
+            <p class="cover-subtitle">从"不知道它是什么"到"能独立完成一个小项目"</p>
+            <div class="cover-tags">
+                <span class="cover-tag">零基础入门</span>
+                <span class="cover-tag">实战导向</span>
+                <span class="cover-tag">7天学会</span>
+                <span class="cover-tag">可复制模板</span>
+            </div>
+        </div>
+
+        <!-- 第2页：为什么新手容易卡住 -->
+        <div class="slide slide-content" data-notes="在正式介绍工具之前，我们先聊聊新手常见的困境。第一，不知道做什么——很多人有想法，但不知道第一步该干什么。第二，不知道怎么做——知道要做什么，但不会写代码。第三，不知道对不对——代码写完了，但不确定有没有 bug。这三个困境的核心是什么？是缺少一个能帮你看到全局、动手干活、还能给你解释原因的伙伴。">
+            <div class="slide-header">
+                <div class="slide-number">01 / 20</div>
+                <h2 class="slide-title">新手的三个困境</h2>
+            </div>
+            <div class="slide-body">
+                <div class="card-grid">
+                    <div class="card">
+                        <div class="card-icon">😕</div>
+                        <h3 class="card-title">不知道做什么</h3>
+                        <p class="card-text">有想法但不知道从哪开始<br>永远停留在"想"的阶段</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon">😰</div>
+                        <h3 class="card-title">不知道怎么做</h3>
+                        <p class="card-text">知道要做什么但不会写代码<br>依赖别人，自己不成长</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon">😨</div>
+                        <h3 class="card-title">不知道对不对</h3>
+                        <p class="card-text">代码写完了但不确定有没有问题<br>提心吊胆，不敢部署</p>
+                    </div>
+                </div>
+                <div class="tip" style="margin-top: 40px;">
+                    <div class="tip-title">💡 核心问题</div>
+                    <p style="font-size: 18px;">缺少一个能<span class="highlight">看到全局</span>、<span class="highlight">动手干活</span>、<span class="highlight">解释原因</span>的伙伴</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 第3页：Claude Code CLI 是什么 -->
+        <div class="slide slide-content" data-notes="Claude Code CLI 是一个在你终端里运行的 AI 编程助手。和网页版的 AI 不同，它能直接操作你电脑上的文件，看到你整个项目的结构。它能帮你读代码、写代码、运行命令、分析报错，还能帮你规划任务。你可以把它想象成一个坐在你电脑前的程序员伙伴。">
+            <div class="slide-header">
+                <div class="slide-number">02 / 20</div>
+                <h2 class="slide-title">Claude Code CLI 是什么？</h2>
+            </div>
+            <div class="slide-body">
+                <div class="tip" style="font-size: 20px; margin-bottom: 40px;">
+                    <p><strong>一句话定义：</strong><br>一个在终端运行的 AI 编程助手，能直接操作你电脑上的文件，<br>看到你的整个项目，帮你写代码、改代码、修 bug。</p>
+                </div>
+                <div class="card-grid">
+                    <div class="card">
+                        <div class="card-icon">📖</div>
+                        <h3 class="card-title">读取</h3>
+                        <p class="card-text">看到你项目的所有文件</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon">✏️</div>
+                        <h3 class="card-title">编写</h3>
+                        <p class="card-text">创建和修改代码文件</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon">🚀</div>
+                        <h3 class="card-title">执行</h3>
+                        <p class="card-text">运行终端命令</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon">🔍</div>
+                        <h3 class="card-title">分析</h3>
+                        <p class="card-text">理解报错并给出方案</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon">📋</div>
+                        <h3 class="card-title">规划</h3>
+                        <p class="card-text">帮你拆解开发任务</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 第4页：与其他工具对比 -->
+        <div class="slide slide-content" data-notes="你可能会问，我为什么不用 ChatGPT 网页版或者 VS Code 插件？网页版 AI 最大的问题是它看不到你的项目，你每次都要复制粘贴。IDE 插件稍微好一点，但通常只能看到当前文件。Claude Code CLI 的优势在于它能看到整个项目，能直接操作文件，还能运行命令。">
+            <div class="slide-header">
+                <div class="slide-number">03 / 20</div>
+                <h2 class="slide-title">为什么选择 Claude Code CLI？</h2>
+            </div>
+            <div class="slide-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>对比项</th>
+                            <th>网页版 AI</th>
+                            <th>IDE 插件</th>
+                            <th>Claude Code CLI</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>能看到项目吗</td>
+                            <td>❌ 只能看粘贴内容</td>
+                            <td>⚠️ 只能看当前文件</td>
+                            <td>✅ 能看整个项目</td>
+                        </tr>
+                        <tr>
+                            <td>能直接改文件吗</td>
+                            <td>❌ 需要手动复制</td>
+                            <td>⚠️ 部分可以</td>
+                            <td>✅ 直接读写</td>
+                        </tr>
+                        <tr>
+                            <td>能执行命令吗</td>
+                            <td>❌ 完全不能</td>
+                            <td>❌ 不能</td>
+                            <td>✅ 可以运行</td>
+                        </tr>
+                        <tr>
+                            <td>能分析报错吗</td>
+                            <td>⚠️ 需要粘贴</td>
+                            <td>⚠️ 需要手动</td>
+                            <td>✅ 自动读取</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="tip" style="margin-top: 30px;">
+                    <div class="tip-title">结论</div>
+                    <p>如果你想<strong>系统开发一个项目</strong>，而不是只要代码片段，Claude Code CLI 是更好的选择</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 第5页：能帮你做什么 -->
+        <div class="slide slide-content" data-notes="具体来说，Claude Code CLI 能帮你做哪些事呢？理解新项目、从零创建项目、修复报错、添加新功能、代码优化。这些场景覆盖了开发的各个环节。">
+            <div class="slide-header">
+                <div class="slide-number">04 / 20</div>
+                <h2 class="slide-title">典型使用场景</h2>
+            </div>
+            <div class="slide-body">
+                <div class="card-grid-2">
+                    <div class="card">
+                        <h3 class="card-title">🔍 场景 1：快速理解新项目</h3>
+                        <div class="code">请分析这个项目的结构，告诉我这是什么类型的项目</div>
+                    </div>
+                    <div class="card">
+                        <h3 class="card-title">✨ 场景 2：从零创建项目</h3>
+                        <div class="code">我想做一个待办清单网页，请帮我创建基础文件结构</div>
+                    </div>
+                    <div class="card">
+                        <h3 class="card-title">🐛 场景 3：修复报错</h3>
+                        <div class="code">我运行报错了，错误信息是 XXX，请帮我分析原因</div>
+                    </div>
+                    <div class="card">
+                        <h3 class="card-title">➕ 场景 4：添加新功能</h3>
+                        <div class="code">请帮我添加编辑任务的功能，用户点击可以修改内容</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 第6页：安装与环境准备 -->
+        <div class="slide slide-content" data-notes="现在我们来看具体的操作。首先是安装。你需要准备四样东西：一台电脑、终端工具、Node.js 环境、以及一个 API Key。安装过程很简单，打开终端，依次输入这几条命令。整个过程通常 5-10 分钟就能完成。">
+            <div class="slide-header">
+                <div class="slide-number">05 / 20</div>
+                <h2 class="slide-title">安装与环境准备</h2>
+            </div>
+            <div class="slide-body">
+                <div class="two-col">
+                    <div class="two-col-left">
+                        <h3 style="color: var(--accent); margin-bottom: 20px;">📦 安装前准备</h3>
+                        <ul class="list list-check">
+                            <li>电脑（Windows/Mac/Linux）</li>
+                            <li>终端工具（Terminal / PowerShell）</li>
+                            <li>Node.js 18+</li>
+                            <li>Anthropic API Key</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 style="color: var(--accent); margin-bottom: 20px;">⚡ 安装步骤</h3>
+                        <div class="code"># 1. 检查 Node.js
+node --version
+
+# 2. 安装 Claude Code CLI
+npm install -g @anthropic-ai/claude-code
+
+# 3. 验证安装
+claude --version
+
+# 4. 启动
+claude</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 第7页：核心操作 -->
+        <div class="slide slide-content" data-notes="安装完成后，我们来学习四个最核心的操作。读取项目、创建文件、修改文件、分析报错。记住，你用自然语言描述任务，它来执行。不需要学复杂的命令，只要会说话就行。">
+            <div class="slide-header">
+                <div class="slide-number">06 / 20</div>
+                <h2 class="slide-title">核心操作详解</h2>
+            </div>
+            <div class="slide-body">
+                <div class="card-grid-2">
+                    <div class="card">
+                        <h3 class="card-title">📖 操作 1：读取项目</h3>
+                        <div class="code">请看一下当前项目的文件结构，告诉我这是什么类型的项目</div>
+                    </div>
+                    <div class="card">
+                        <h3 class="card-title">✨ 操作 2：创建文件</h3>
+                        <div class="code">请创建 index.html，包含一个标题和一个输入框</div>
+                    </div>
+                    <div class="card">
+                        <h3 class="card-title">✏️ 操作 3：修改文件</h3>
+                        <div class="code">请修改 index.html，把标题改成"我的待办清单"</div>
+                    </div>
+                    <div class="card">
+                        <h3 class="card-title">🐛 操作 4：分析报错</h3>
+                        <div class="code">我运行时报错了，错误信息是：[粘贴错误]<br>请帮我分析原因并修复</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 第8页：常见错误 -->
+        <div class="slide slide-content" data-notes="在教了很多新手之后，我总结出五个最常见的错误。第一个，一次生成全部内容——这是大忌。第二个，描述模糊。第三个，不验证就接受。第四个，不用 git。第五个，完全依赖 AI。记住一个原则：小步快跑，持续验证。">
+            <div class="slide-header">
+                <div class="slide-number">07 / 20</div>
+                <h2 class="slide-title">新手最容易犯的 5 个错误</h2>
+            </div>
+            <div class="slide-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>错误</th>
+                            <th>问题</th>
+                            <th>正确做法</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>一次生成全部</td>
+                            <td>质量差、难调试</td>
+                            <td>分步开发，一次一个功能</td>
+                        </tr>
+                        <tr>
+                            <td>描述模糊</td>
+                            <td>输出不符合预期</td>
+                            <td>具体描述，给出示例</td>
+                        </tr>
+                        <tr>
+                            <td>不验证就接受</td>
+                            <td>可能引入 bug</td>
+                            <td>每次改动后立即测试</td>
+                        </tr>
+                        <tr>
+                            <td>不用 git</td>
+                            <td>改坏无法回退</td>
+                            <td>每完成一步就提交</td>
+                        </tr>
+                        <tr>
+                            <td>完全依赖 AI</td>
+                            <td>自己不成长</td>
+                            <td>理解逻辑，学会判断</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="tip" style="margin-top: 30px; text-align: center;">
+                    <p style="font-size: 22px;"><strong>核心原则：小步快跑，持续验证</strong></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 第9页：能力地图 -->
+        <div class="slide slide-content" data-notes="用好 Claude Code CLI 不只是会打命令，你还需要培养 10 项核心能力。需求理解、任务拆解、提示词表达、项目阅读——这些是规划能力。代码修改、报错理解、调试、测试验收——这些是执行能力。迭代优化和 AI 协作——这些是元能力。记住：AI 是放大器，不是替代品。">
+            <div class="slide-header">
+                <div class="slide-number">08 / 20</div>
+                <h2 class="slide-title">做项目必须具备的 10 项能力</h2>
+            </div>
+            <div class="slide-body">
+                <div class="card-grid-4">
+                    <div class="card" style="text-align: center;">
+                        <div class="card-icon">🎯</div>
+                        <h3 class="card-title">需求理解</h3>
+                    </div>
+                    <div class="card" style="text-align: center;">
+                        <div class="card-icon">📦</div>
+                        <h3 class="card-title">任务拆解</h3>
+                    </div>
+                    <div class="card" style="text-align: center;">
+                        <div class="card-icon">💬</div>
+                        <h3 class="card-title">提示词表达</h3>
+                    </div>
+                    <div class="card" style="text-align: center;">
+                        <div class="card-icon">📂</div>
+                        <h3 class="card-title">项目阅读</h3>
+                    </div>
+                    <div class="card" style="text-align: center;">
+                        <div class="card-icon">✏️</div>
+                        <h3 class="card-title">代码修改</h3>
+                    </div>
+                    <div class="card" style="text-align: center;">
+                        <div class="card-icon">🔍</div>
+                        <h3 class="card-title">报错理解</h3>
+                    </div>
+                    <div class="card" style="text-align: center;">
+                        <div class="card-icon">🔧</div>
+                        <h3 class="card-title">调试能力</h3>
+                    </div>
+                    <div class="card" style="text-align: center;">
+                        <div class="card-icon">✅</div>
+                        <h3 class="card-title">测试验收</h3>
+                    </div>
+                </div>
+                <div class="card-grid-2" style="margin-top: 24px;">
+                    <div class="card" style="text-align: center;">
+                        <div class="card-icon">🔄</div>
+                        <h3 class="card-title">迭代优化</h3>
+                    </div>
+                    <div class="card" style="text-align: center;">
+                        <div class="card-icon">🤝</div>
+                        <h3 class="card-title">与 AI 协作</h3>
+                    </div>
+                </div>
+                <div class="tip" style="margin-top: 30px; text-align: center;">
+                    <p style="font-size: 18px;"><strong>AI 是放大器，不是替代品。你的能力越强，AI 的价值越大。</strong></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 第10页：实战项目介绍 -->
+        <div class="slide slide-content" data-notes="接下来我们进入实战环节。为什么选择待办清单作为第一个项目？因为它的功能非常直观，核心功能就三个，范围可控。技术覆盖也很全面，HTML、CSS、JavaScript 都能练到。而且每做一个功能，立刻就能看到效果。">
+            <div class="slide-header">
+                <div class="slide-number">09 / 20</div>
+                <h2 class="slide-title">实战项目：个人待办清单</h2>
+            </div>
+            <div class="slide-body">
+                <div class="two-col">
+                    <div class="two-col-left">
+                        <h3 style="color: var(--accent); margin-bottom: 20px;">✅ 为什么选择待办清单？</h3>
+                        <ul class="list list-check">
+                            <li>功能直观，你每天都在用</li>
+                            <li>范围可控，核心功能就 3 个</li>
+                            <li>技术覆盖全面（HTML/CSS/JS）</li>
+                            <li>即时反馈，立竿见影</li>
+                            <li>可扩展，后续可加功能</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 style="color: var(--accent); margin-bottom: 20px;">📋 最终成品</h3>
+                        <div class="card">
+                            <ul class="list list-check">
+                                <li>输入框 + 添加按钮</li>
+                                <li>任务列表（可标记完成/删除）</li>
+                                <li>数据保存在浏览器中</li>
+                                <li>简洁美观的界面</li>
+                            </ul>
+                        </div>
+                        <p style="margin-top: 20px; color: var(--text-light);">技术栈：纯 HTML + CSS + JavaScript</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 第11页：流程 1-3 步 -->
+        <div class="slide slide-content" data-notes="现在我们开始从 0 到 1 的实战流程。第一步是明确需求。很多新手失败的原因就是需求太大太模糊。第二步是拆解任务。第三步是初始化项目。这三步是规划阶段，磨刀不误砍柴工。">
+            <div class="slide-header">
+                <div class="slide-number">10 / 20</div>
+                <h2 class="slide-title">第 1-3 步：规划与初始化</h2>
+            </div>
+            <div class="slide-body">
+                <div class="flow" style="margin-bottom: 40px;">
+                    <div class="flow-item">
+                        <h5>第 1 步</h5>
+                        <p>明确需求</p>
+                    </div>
+                    <span class="flow-arrow">→</span>
+                    <div class="flow-item">
+                        <h5>第 2 步</h5>
+                        <p>拆解任务</p>
+                    </div>
+                    <span class="flow-arrow">→</span>
+                    <div class="flow-item">
+                        <h5>第 3 步</h5>
+                        <p>初始化项目</p>
+                    </div>
+                </div>
+                <div class="compare">
+                    <div class="compare-bad">
+                        <h4>❌ 错误示范</h4>
+                        <p>"我要做一个功能强大的待办清单，要有登录、云同步、分类、优先级、提醒..."</p>
+                        <p style="margin-top: 12px; color: var(--danger);">问题：范围太大，新手做不完</p>
+                    </div>
+                    <div class="compare-good">
+                        <h4>✅ 正确示范</h4>
+                        <p>"能添加、完成、删除任务，数据存浏览器，界面简洁就行"</p>
+                        <p style="margin-top: 12px; color: var(--success);">优点：范围清晰，容易完成</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 第12页：MVP -->
+        <div class="slide slide-content" data-notes="第四步是生成 MVP——最小可行产品。这是一个非常重要的概念。MVP 就是用最少的代码，先让东西能跑起来。为什么要这样做？因为这样可以快速验证你的想法对不对，尽早发现重大问题，而且能建立信心。记住：先跑起来，再优化。">
+            <div class="slide-header">
+                <div class="slide-number">11 / 20</div>
+                <h2 class="slide-title">第 4 步：生成 MVP</h2>
+            </div>
+            <div class="slide-body">
+                <div class="tip" style="margin-bottom: 30px;">
+                    <div class="tip-title">💡 什么是 MVP？</div>
+                    <p style="font-size: 18px;"><strong>MVP = Minimum Viable Product（最小可行产品）</strong><br>用最少的代码，先让东西能跑起来</p>
+                </div>
+                <div class="card-grid-2">
+                    <div class="card">
+                        <h3 class="card-title">✅ 为什么要先做 MVP？</h3>
+                        <ul class="list list-check">
+                            <li>快速验证想法</li>
+                            <li>尽早发现重大问题</li>
+                            <li>建立信心和成就感</li>
+                            <li>便于后续增量开发</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3 class="card-title">📝 提示词示例</h3>
+                        <div class="code">请帮我完成最基础的版本：
+1. index.html：标题+输入框+按钮
+2. styles.css：最基础的样式
+3. app.js：暂时留空
+
+要求：先让页面能显示出来</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 第13页：逐步添加功能 -->
+        <div class="slide slide-content" data-notes="第五步是逐步添加功能。这里有一个核心原则：一次只加一个功能。添加完测试通过，提交 git，然后再加下一个。这样做的好处是，如果出问题，你马上就能知道是哪里错了。">
+            <div class="slide-header">
+                <div class="slide-number">12 / 20</div>
+                <h2 class="slide-title">第 5 步：逐步添加功能</h2>
+            </div>
+            <div class="slide-body">
+                <div class="tip" style="margin-bottom: 30px; text-align: center;">
+                    <p style="font-size: 24px;"><strong>核心原则：一次只加一个功能</strong></p>
+                </div>
+                <div class="flow">
+                    <div class="flow-item">
+                        <h5>功能 1</h5>
+                        <p>添加任务</p>
+                    </div>
+                    <span class="flow-arrow">→</span>
+                    <div class="flow-item">
+                        <h5>测试</h5>
+                        <p>验证通过</p>
+                    </div>
+                    <span class="flow-arrow">→</span>
+                    <div class="flow-item">
+                        <h5>Git</h5>
+                        <p>提交保存</p>
+                    </div>
+                    <span class="flow-arrow">→</span>
+                    <div class="flow-item">
+                        <h5>功能 2</h5>
+                        <p>标记完成</p>
+                    </div>
+                    <span class="flow-arrow">→</span>
+                    <div class="flow-item">
+                        <h5>...</h5>
+                        <p>继续迭代</p>
+                    </div>
+                </div>
+                <div class="card" style="margin-top: 30px;">
+                    <h3 class="card-title">📝 提示词结构</h3>
+                    <div class="code">现在实现 [功能名称]：
+1. 用户操作：[怎么用]
+2. 显示效果：[长什么样]
+3. 数据处理：[存什么/取什么]
+
+请在 app.js 中添加代码</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 第14页：报错处理 -->
+        <div class="slide slide-content" data-notes="第六步是运行、报错、修复。新手最怕的就是报错，但其实报错是你学习的最好机会。遇到报错不要慌，按这四步来。记住，报错不可怕，可怕的是不知道怎么处理报错。">
+            <div class="slide-header">
+                <div class="slide-number">13 / 20</div>
+                <h2 class="slide-title">第 6 步：运行、报错、修复</h2>
+            </div>
+            <div class="slide-body">
+                <h3 style="color: var(--accent); margin-bottom: 20px;">报错时该怎么办？</h3>
+                <div class="card-grid-2">
+                    <div class="card">
+                        <ol class="list list-num">
+                            <li><strong>不要慌！</strong>错误信息是解决问题的线索</li>
+                            <li><strong>复制完整错误信息</strong></li>
+                            <li><strong>告诉 AI 上下文</strong>：你在做什么、期望什么、实际发生什么</li>
+                            <li><strong>让 AI 解释原因、给出方案、验证修复</strong></li>
+                        </ol>
+                    </div>
+                    <div class="card">
+                        <h3 class="card-title">📝 提示词示例</h3>
+                        <div class="code">我在测试添加任务时遇到错误：
+
+错误信息：
+Uncaught TypeError: Cannot read
+property 'addEventListener' of null
+
+我正在做什么：点击添加按钮
+期望结果：任务出现在列表中
+实际结果：没有反应
+
+请解释原因并修复</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 第15页：优化测试迭代 -->
+        <div class="slide slide-content" data-notes="第七步是优化。注意：功能全部完成后，再考虑优化。第八步是测试与验收。让 AI 帮你生成测试清单，逐项验证。第九步是继续迭代。这三步是闭环，做完这轮，可以开始下一轮。">
+            <div class="slide-header">
+                <div class="slide-number">14 / 20</div>
+                <h2 class="slide-title">第 7-9 步：优化、测试、迭代</h2>
+            </div>
+            <div class="slide-body">
+                <div class="card-grid">
+                    <div class="card">
+                        <h3 class="card-title">🔄 第 7 步：优化</h3>
+                        <ul class="list">
+                            <li>功能完成后才优化</li>
+                            <li>让 AI 检查代码质量</li>
+                            <li>优化界面和交互</li>
+                            <li>每次优化都要验证</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3 class="card-title">✅ 第 8 步：测试验收</h3>
+                        <ul class="list">
+                            <li>生成测试检查清单</li>
+                            <li>正常用例：功能正常工作</li>
+                            <li>边界用例：空输入、超长输入</li>
+                            <li>异常用例：错误操作</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3 class="card-title">🔁 第 9 步：继续迭代</h3>
+                        <ul class="list">
+                            <li>规划下一批功能</li>
+                            <li>保持增量开发节奏</li>
+                            <li>每次迭代都要测试</li>
+                            <li>定期复盘总结</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 第16页：提示词模板 -->
+        <div class="slide slide-content" data-notes="这里给大家整理了六个常用提示词模板。这些模板可以直接复制使用。记住一个黄金法则：描述越具体，输出越准确。">
+            <div class="slide-header">
+                <div class="slide-number">15 / 20</div>
+                <h2 class="slide-title">实用提示词模板库</h2>
+            </div>
+            <div class="slide-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>场景</th>
+                            <th>模板关键句</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>项目分析</td>
+                            <td>"请分析当前项目结构，告诉我类型/技术栈/入口文件"</td>
+                        </tr>
+                        <tr>
+                            <td>需求拆解</td>
+                            <td>"请帮我拆解开发任务，按优先级排序，标注难度"</td>
+                        </tr>
+                        <tr>
+                            <td>创建功能</td>
+                            <td>"请实现 [功能]，用户操作是 [X]，显示效果是 [Y]"</td>
+                        </tr>
+                        <tr>
+                            <td>Bug 修复</td>
+                            <td>"错误信息是 [X]，我在做 [Y]，请解释原因并修复"</td>
+                        </tr>
+                        <tr>
+                            <td>代码优化</td>
+                            <td>"请检查 [文件] 代码质量，指出可改进的地方"</td>
+                        </tr>
+                        <tr>
+                            <td>测试清单</td>
+                            <td>"请生成测试清单，包含正常/边界/异常用例"</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="tip" style="margin-top: 30px; text-align: center;">
+                    <p style="font-size: 22px;"><strong>黄金法则：描述越具体，输出越准确</strong></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 第17页：FAQ -->
+        <div class="slide slide-content" data-notes="我整理了新手最常问的五个问题。不会写代码能不能用？可以，但你仍然需要能描述清楚需求。要不要一次生成全部？绝对不要。为什么输出不符合预期？通常是你描述不够具体。看不懂报错怎么办？交给 AI 解释。怎么判断对不对？运行测试、让 AI 解释逻辑。">
+            <div class="slide-header">
+                <div class="slide-number">16 / 20</div>
+                <h2 class="slide-title">新手最常问的 5 个问题</h2>
+            </div>
+            <div class="slide-body">
+                <div class="card-grid-2">
+                    <div class="card">
+                        <h3 class="card-title">Q1：我不会写代码，能用吗？</h3>
+                        <p class="card-text">可以，但你仍需能描述清楚需求、判断对错、持续追问</p>
+                    </div>
+                    <div class="card">
+                        <h3 class="card-title">Q2：我该一次性生成全部吗？</h3>
+                        <p class="card-text">绝对不要！分步开发，一次一个功能</p>
+                    </div>
+                    <div class="card">
+                        <h3 class="card-title">Q3：为什么输出不符合预期？</h3>
+                        <p class="card-text">通常是描述不够具体，给出更详细的需求或参考示例</p>
+                    </div>
+                    <div class="card">
+                        <h3 class="card-title">Q4：看不懂报错怎么办？</h3>
+                        <p class="card-text">把错误信息完整复制给 AI，让它解释</p>
+                    </div>
+                </div>
+                <div class="card" style="margin-top: 20px;">
+                    <h3 class="card-title">Q5：怎么判断 AI 写得对不对？</h3>
+                    <p class="card-text">运行测试、让 AI 解释逻辑、对比原始需求</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 第18页：7天学习路径 -->
+        <div class="slide slide-content" data-notes="最后给大家一个 7 天学习路径。第一天认识工具，完成安装。第二天学习基本操作。第三天确定项目并拆分任务。第四天开发 MVP。第五天增量开发。第六天优化和测试。第七天总结复盘。按照这个路径，7 天后你就能做出一个完整的小项目。">
+            <div class="slide-header">
+                <div class="slide-number">17 / 20</div>
+                <h2 class="slide-title">Claude Code 新手 7 天入门计划</h2>
+            </div>
+            <div class="slide-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>天数</th>
+                            <th>学习重点</th>
+                            <th>输出目标</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Day 1</td>
+                            <td>认识工具、安装配置</td>
+                            <td>Claude Code 能运行</td>
+                        </tr>
+                        <tr>
+                            <td>Day 2</td>
+                            <td>基本操作：创建/读取/修改</td>
+                            <td>完成一个 HTML 页面</td>
+                        </tr>
+                        <tr>
+                            <td>Day 3</td>
+                            <td>任务拆解</td>
+                            <td>需求文档 + 任务清单</td>
+                        </tr>
+                        <tr>
+                            <td>Day 4</td>
+                            <td>MVP 开发</td>
+                            <td>项目能跑起来</td>
+                        </tr>
+                        <tr>
+                            <td>Day 5</td>
+                            <td>增量开发</td>
+                            <td>核心功能完成 80%</td>
+                        </tr>
+                        <tr>
+                            <td>Day 6</td>
+                            <td>优化测试</td>
+                            <td>功能全部完成</td>
+                        </tr>
+                        <tr>
+                            <td>Day 7</td>
+                            <td>总结复盘</td>
+                            <td>完整项目 + 学习笔记</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 第19页：三条建议 -->
+        <div class="slide slide-content" data-notes="最后，给大家三条最重要的建议。第一，先做起来，不要等学会再动手。第二，小步快跑，一次只做一件事。第三，保持思考，不要盲从 AI。记住：AI 是你的工具，不是你的替代品。现在就开始你的第一个项目吧！">
+            <div class="slide-header">
+                <div class="slide-number">18 / 20</div>
+                <h2 class="slide-title">给新手的三条建议</h2>
+            </div>
+            <div class="slide-body">
+                <div class="card-grid">
+                    <div class="card" style="text-align: center; padding: 40px 24px;">
+                        <div class="card-icon">1️⃣</div>
+                        <h3 class="card-title" style="font-size: 22px;">先做起来</h3>
+                        <p class="card-text" style="font-size: 16px;">不要等学会再动手<br>边做边学，在实践中掌握</p>
+                    </div>
+                    <div class="card" style="text-align: center; padding: 40px 24px;">
+                        <div class="card-icon">2️⃣</div>
+                        <h3 class="card-title" style="font-size: 22px;">小步快跑</h3>
+                        <p class="card-text" style="font-size: 16px;">一次只做一件事<br>增量开发，降低出错风险</p>
+                    </div>
+                    <div class="card" style="text-align: center; padding: 40px 24px;">
+                        <div class="card-icon">3️⃣</div>
+                        <h3 class="card-title" style="font-size: 22px;">保持思考</h3>
+                        <p class="card-text" style="font-size: 16px;">不要盲从 AI<br>你做决策，AI 执行</p>
+                    </div>
+                </div>
+                <div class="tip" style="margin-top: 40px; text-align: center;">
+                    <p style="font-size: 28px;"><strong>现在就开始你的第一个项目吧！</strong></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 第20页：结束页 -->
+        <div class="slide slide-end" data-notes="感谢大家参加今天的培训。培训材料会分享给大家，里面有完整的 HTML 讲义和提示词模板。如果有问题，可以通过后面的渠道联系我。祝大家在 AI 编程的路上越走越远，做出更多有趣的项目！">
+            <h1 class="end-title">🎉 谢谢大家</h1>
+            <p class="end-text">祝大家在 AI 编程的路上越走越远！</p>
+            <div class="card" style="max-width: 500px; margin: 0 auto;">
+                <p style="text-align: center; color: var(--text-light);">
+                    📁 培训材料：claude-code-training.html<br>
+                    📋 PPT 文件：claude-code-training-slides.html<br>
+                    💬 问题反馈：欢迎随时交流
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 导航控制 -->
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="prevSlide()">←</button>
+        <button class="nav-btn" onclick="nextSlide()">→</button>
+    </div>
+
+    <!-- 页码指示 -->
+    <div class="page-indicator" id="pageIndicator"></div>
+
+    <!-- 帮助提示 -->
+    <div class="help-hint">
+        按 ← → 切换页面 | 按 S 显示演讲备注 | 按 F 全屏
+    </div>
+
+    <!-- 演讲者备注 -->
+    <div class="speaker-notes" id="speakerNotes">
+        <h4>🎤 演讲者备注</h4>
+        <p id="notesContent"></p>
+    </div>
+
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        let currentSlide = 0;
+        let speakerNotesVisible = false;
+
+        // 初始化页码指示器
+        function initPageIndicator() {
+            const indicator = document.getElementById('pageIndicator');
+            for (let i = 0; i < totalSlides; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'page-dot' + (i === 0 ? ' active' : '');
+                dot.onclick = () => goToSlide(i);
+                indicator.appendChild(dot);
+            }
+        }
+
+        // 更新页码指示器
+        function updatePageIndicator() {
+            const dots = document.querySelectorAll('.page-dot');
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === currentSlide);
+            });
+        }
+
+        // 切换幻灯片
+        function goToSlide(index) {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = index;
+            slides[currentSlide].classList.add('active');
+            updatePageIndicator();
+            updateSpeakerNotes();
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                goToSlide(currentSlide + 1);
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                goToSlide(currentSlide - 1);
+            }
+        }
+
+        // 演讲者备注
+        function updateSpeakerNotes() {
+            const notes = slides[currentSlide].getAttribute('data-notes');
+            document.getElementById('notesContent').textContent = notes || '暂无备注';
+        }
+
+        function toggleSpeakerNotes() {
+            speakerNotesVisible = !speakerNotesVisible;
+            document.getElementById('speakerNotes').classList.toggle('show', speakerNotesVisible);
+        }
+
+        // 键盘控制
+        document.addEventListener('keydown', (e) => {
+            switch(e.key) {
+                case 'ArrowRight':
+                case ' ':
+                    nextSlide();
+                    break;
+                case 'ArrowLeft':
+                    prevSlide();
+                    break;
+                case 's':
+                case 'S':
+                    toggleSpeakerNotes();
+                    break;
+                case 'f':
+                case 'F':
+                    if (!document.fullscreenElement) {
+                        document.documentElement.requestFullscreen();
+                    } else {
+                        document.exitFullscreen();
+                    }
+                    break;
+            }
+        });
+
+        // 初始化
+        initPageIndicator();
+        updateSpeakerNotes();
+
+        // 隐藏帮助提示（5秒后）
+        setTimeout(() => {
+            document.querySelector('.help-hint').style.opacity = '0';
+            document.querySelector('.help-hint').style.transition = 'opacity 1s';
+        }, 5000);
+    </script>
+</body>
+</html>
